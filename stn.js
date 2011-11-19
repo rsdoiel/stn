@@ -12,6 +12,46 @@
 //
 
 var stn = {
+	_msgs : [],
+	
+	/**
+	 * error - collect parse errors into the _msgs array.
+	 * @param msg - the message to the collection of messages.
+	 * @return true on successful add, false otherwise
+	 */
+	error : function (msg) {
+		var i = this._msgs.length;
+		
+		this._msgs.push('ERROR: ' + msg);
+		if ((i + 1) !== this._msgs.length) {
+			return false;
+		}
+		return true;
+	},
+	
+	/**
+	 * messages - return the _msgs array as a single string delimited
+	 * by new lines.
+	 * @param no_clear (optional, defaults to false)
+	 * @return string representing in messages
+	 */
+	messages : function (no_clear) {
+		var result = this._msgs.join("\n");
+
+		// set optional default i needed
+		if (no_clear !== undefined) {
+			no_clear = false;
+		}
+
+		if (no_clear === true) {
+			return result;
+		}
+
+		// Clear the messages
+		this._msgs = [];
+		return result;
+	},
+
 	/**
 	 * parse - parse a block of plain text and
 	 * pass the results to the callback method 
@@ -24,6 +64,9 @@ var stn = {
 	 * errors were found.
 	 */
 	parse : function (text, callback, options) {
+		var lines = text.replace(/\r/g,'').split("\n"),
+			errors = [];
+		
 		if (callback !== undefined) {
 			callback("stn.parse not implemented.", options);
 		}
@@ -32,3 +75,5 @@ var stn = {
 };
 
 exports.parse = stn.parse;
+exports.error = stn.error;
+exports.messages = stn.messages;

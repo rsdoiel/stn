@@ -33,7 +33,7 @@ assert.strictEqual(typeof stn.parse, 'function', "Should have an stn.parse metho
 
 // Call as simple function without callback or options
 result = stn.parse(sample1_text);
-assert.ok(result, "Should get a non-false results from parsing sample1_text");
+assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
 
 // Check if result can be found in sample1_json 
 Object.keys(result).forEach(function (dy) {
@@ -46,5 +46,3 @@ Object.keys(sample1_json).forEach(function (dy) {
 	var range, notes;
 	assert.ok(result[dy] !== undefined, "Checking for day " + dy + " with " + util.inspect(sample1_json[dy]));
 });
-
-
