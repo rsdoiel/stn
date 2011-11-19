@@ -95,8 +95,16 @@ var self = {
 			}
 		});
 		
-		if (callback !== undefined) {
-			callback(null, data, options);
+		// If options.hours, options.notes true then processing
+		// into a more complex object tree.
+				
+		// Finished parse, return the results
+		if (callback !== undefined && typeof callback === 'function') {
+			if (self.errorCount() === 0) {
+				callback(null, data, options);
+			} else {
+				callback(self.messages(), data, options);
+			}
 		}
 		
 		if (self.errorCount() > 0) {
