@@ -18,6 +18,8 @@ var	util = require('util'),
 	sample1_text, sample1_json,
 	src;
 
+console.log("Starting [stn-test.js] ...");
+
 // Setup and read in samples to run tests on
 sample1_text = fs.readFileSync("test-samples/timesheet-1.txt").toString();
 try {
@@ -28,21 +30,32 @@ try {
 }
 
 // Testing
+console.log("Checking module setup ...")
 assert.strictEqual(typeof stn, 'object', "Should have an stn object: " + typeof stn);
 assert.strictEqual(typeof stn.parse, 'function', "Should have an stn.parse method on stn object: " + util.inspect(stn));
 
+
+console.log("Checking parse method ...");
 // Call as simple function without callback or options
 result = stn.parse(sample1_text);
 assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
 
-// Check if result can be found in sample1_json 
-Object.keys(result).forEach(function (dy) {
-	var range, notes;
-	assert.ok(sample1_json[dy] !== undefined, "Checking for day " + dy + " with " + util.inspect(result[dy])); 
-});
-
-// Check if each entry in sample1_json is in result
+console.log("Checking parse results ...");
+// Check for missing results
 Object.keys(sample1_json).forEach(function (dy) {
 	var range, notes;
-	assert.ok(result[dy] !== undefined, "Checking for day " + dy + " with " + util.inspect(sample1_json[dy]));
+	assert.ok(result[dy] !== undefined, "missing from sample1 " + dy + " <-- " + util.inspect(sample1_json[dy])); 
+	assert.equal(sample1_json[dy], result[dy], "sample1 " + util.inspect(sample1_json[dy]) + " result " + util.inspect(result[dy])); 
 });
+console.log("... No missing results");
+
+// Check for unexpected results 
+Object.keys(result).forEach(function (dy) {
+	var range, notes;
+	assert.ok(sample1_json[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
+	assert.equal(result[dy], sample1_json[dy], "result " + util.inspect(result[dy]) + " sample1 " + util.inspect(sample1_json[dy])); 
+});
+console.log("... No unexpected results");
+
+
+console.log("Success!");

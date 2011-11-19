@@ -76,15 +76,21 @@ var self = {
 	 */
 	parse : function (text, callback, options) {
 		var data = {}, ky, lines = text.replace(/\r/g,'').split("\n"),
-		reDateEntry = /[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]$/;
+		reDateEntry = /[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]$/,
+		reTimeEntry = /[0-9]+:[0-5][0-9][\s]*-[\s]*[0-9]+:[0-5][0-9]/;
 
 		// Read through the text line, by line and create a new JSON
 		// blob
 		lines.forEach(function (line, i) {
+			line = line.trim();
 			switch (true) {
 				case reDateEntry.exec(line):
 					ky = line.trim();
 					data[ky] = {};
+					break;
+				case reTimeEntry.exec(line):
+					rn = reTimeEntry.exec(line) 
+					data[ky][rm[0]] = line.substr(rn[0].length);
 					break;
 			}
 		});
