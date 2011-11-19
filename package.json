@@ -1,0 +1,31 @@
+{
+	"name" : "stn",
+	"version" : "0.0.1-alpha",
+	"description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
+	"main" : "./stn.js",
+	"repository" : {
+		"type" : "git", 
+		"url" : "https://github.com/rsdoiel/Simple-Timesheet-Notation.git"
+	},
+	"author" : {
+		"name" : "R. S. Doiel", 
+		"email" : "rsdoiel@gmail.com", 
+		"url" : "https://github.com/rsdoiel"
+	},
+	"maintainers" : [{
+		"name" : "R. S. Doiel", 
+		"url" : "https://github.com/rsdoiel"
+	}],
+	"engines" : {
+		"node" : ">= 0.6",
+		"npm" : ">= 1"
+	},
+	"dependencies" : {
+	},
+	"scripts" : {
+		"test" : "node stn-test.js"
+	},
+	"bugs": {
+		"url": "http://github.com/rsdoiel/Simple-Timesheet-Notation/issues"
+   	}
+}
