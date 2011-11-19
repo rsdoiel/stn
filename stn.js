@@ -1,5 +1,5 @@
 //
-// stn.js - a JavaScript module for processing plain text in 
+// self.js - a JavaScript module for processing plain text in 
 // Simple Timesheet Notation
 //
 // @author: R. S. Doiel, <rsdoiel@gmail.com>
@@ -11,7 +11,7 @@
 // revision: 0.0.1-alpha
 //
 
-var stn = {
+var self = {
 	_msgs : [],
 	
 	/**
@@ -20,13 +20,24 @@ var stn = {
 	 * @return true on successful add, false otherwise
 	 */
 	error : function (msg) {
-		var i = this._msgs.length;
+		var i = self._msgs.length;
 		
-		this._msgs.push('ERROR: ' + msg);
-		if ((i + 1) !== this._msgs.length) {
+		self._msgs.push('ERROR: ' + msg);
+		if ((i + 1) !== self._msgs.length) {
 			return false;
 		}
 		return true;
+	},
+	
+	/**
+	 * errorCount - number of error messages collected.
+	 * @return number of error messages.
+	 */
+	errorCount : function () {
+		if (self._msgs === undefined) {
+			return 0;
+		}
+		return self._msgs.length;
 	},
 	
 	/**
@@ -36,7 +47,7 @@ var stn = {
 	 * @return string representing in messages
 	 */
 	messages : function (no_clear) {
-		var result = this._msgs.join("\n");
+		var result = self._msgs.join("\n");
 
 		// set optional default i needed
 		if (no_clear !== undefined) {
@@ -48,7 +59,7 @@ var stn = {
 		}
 
 		// Clear the messages
-		this._msgs = [];
+		self._msgs = [];
 		return result;
 	},
 
@@ -64,16 +75,31 @@ var stn = {
 	 * errors were found.
 	 */
 	parse : function (text, callback, options) {
-		var lines = text.replace(/\r/g,'').split("\n"),
-			errors = [];
+		var data = {}, ky, lines = text.replace(/\r/g,'').split("\n"),
+		reDateEntry = /[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]$/;
+
+		// Read through the text line, by line and create a new JSON
+		// blob
+		lines.forEach(function (line, i) {
+			switch (true) {
+				case reDateEntry.exec(line):
+					ky = line.trim();
+					data[ky] = {};
+					break;
+			}
+		});
 		
 		if (callback !== undefined) {
-			callback("stn.parse not implemented.", options);
+			callback(null, data, options);
 		}
-		return false;
+		
+		if (self.errorCount() > 0) {
+			return false;
+		}
+		return data;
 	}
 };
 
-exports.parse = stn.parse;
-exports.error = stn.error;
-exports.messages = stn.messages;
+exports.parse = self.parse;
+exports.error = self.error;
+exports.messages = self.messages;
