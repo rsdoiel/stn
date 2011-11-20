@@ -15,7 +15,7 @@ var	util = require('util'),
 	fs = require('fs'),
 	assert = require('assert'),
 	stn = require('./stn'),
-	sample1_text, sample1a_json,
+	sample1_text, sample1a,
 	src;
 
 console.log("Starting [stn-test.js] ...");
@@ -23,7 +23,7 @@ console.log("Starting [stn-test.js] ...");
 // Setup and read in samples to run tests on
 sample1_text = fs.readFileSync("test-samples/timesheet-1.txt").toString();
 try {
-	sample1a_json = JSON.parse(fs.readFileSync("test-samples/timesheet-1a.json").toString());
+	sample1a = JSON.parse(fs.readFileSync("test-samples/timesheet-1a.json").toString());
 } catch (err) {
 	console.error("TEST JSON ERROR: " + err);
 	process.exit(1);
@@ -40,20 +40,27 @@ console.log("Checking parse method ...");
 result = stn.parse(sample1_text);
 assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
 
-console.log("Checking parse results ...");
+console.log("Checking for missing results ...");
 // Check for missing results
-Object.keys(sample1a_json).forEach(function (dy) {
+Object.keys(sample1a).forEach(function (dy) {
 	var range, notes;
-	assert.ok(result[dy] !== undefined, "missing from sample1 " + dy + " <-- " + util.inspect(sample1a_json[dy])); 
-	assert.equal(sample1a_json[dy], result[dy], "sample1 " + util.inspect(sample1a_json[dy]) + " result " + util.inspect(result[dy])); 
+	assert.ok(result[dy] !== undefined, "missing from sample1 " + dy + " <-- " + util.inspect(sample1a[dy]));
+	Object.keys(sample1a[dy]).forEach(function (tm) {
+		assert.ok(result[dy][tm] !== undefined, 'sample1 ' + dy + ' -> ' + tm + ' missing in result ' + util.inspect(result[dy]));
+		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
+	});
 });
 console.log("... No missing results");
 
+console.log("Checking for unexpected results ...");
 // Check for unexpected results 
 Object.keys(result).forEach(function (dy) {
 	var range, notes;
-	assert.ok(sample1a_json[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
-	assert.equal(result[dy], sample1a_json[dy], "result " + util.inspect(result[dy]) + " sample1 " + util.inspect(sample1a_json[dy])); 
+	assert.ok(sample1a[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
+	Object.keys(result[dy]).forEach(function (tm) {
+		assert.ok(result[dy][tm] !== undefined, "result " + dy + ' -> ' + tm + " missing in simple1a " + util.inspect(sample1a[dy])); 
+		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
+	});
 });
 console.log("... No unexpected results");
 

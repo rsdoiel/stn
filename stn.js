@@ -11,9 +11,15 @@
 // revision: 0.0.1-alpha
 //
 
+var util = require('util');
+
 var self = {
 	_msgs : [],
-	
+	_defaults : {
+		notes:true,
+		hours:false,
+		tags:false,
+	},
 	/**
 	 * error - collect parse errors into the _msgs array.
 	 * @param msg - the message to the collection of messages.
@@ -75,23 +81,39 @@ var self = {
 	 * errors were found.
 	 */
 	parse : function (text, callback, options) {
-		var data = {}, ky, lines = text.replace(/\r/g,'').split("\n"),
-		reDateEntry = /[0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]$/,
-		reTimeEntry = /[0-9]+:[0-5][0-9][\s]*-[\s]*[0-9]+:[0-5][0-9]/;
+		var lines, data = {}, dy, tm, tmpArray = [],
+			reDataEntry, reTimeEntry, reTime;
+
+		lines = text.replace(/\r/g,'').split("\n")
+		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
+		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
+		reTime = /[0-9]+:[0-5][0-9]/;
 
 		// Read through the text line, by line and create a new JSON
 		// blob
 		lines.forEach(function (line, i) {
 			line = line.trim();
-			switch (true) {
-				case reDateEntry.exec(line):
-					ky = line.trim();
-					data[ky] = {};
-					break;
-				case reTimeEntry.exec(line):
-					rn = reTimeEntry.exec(line) 
-					data[ky][rm[0]] = line.substr(rn[0].length);
-					break;
+			if (reDateEntry.exec(line)) {
+				dy = line.trim();
+				data[dy] = {};
+			} else if (reTimeEntry.exec(line)) {
+				tm = (reTimeEntry.exec(line))[0].trim();
+				line = line.substr(tm.length).trim();
+				if (tm.substr(-1) === ':' || 
+					tm.substr(-1) === ';' || 
+					tm.substr(-1) === ',') {
+					tm = tm.slice(0,tm.length - 1).trim();
+				}
+				data[dy][tm] = line;
+			} else if (line !== "" &&
+				data[dy] !== undefined &&
+				data[dy][tm] !== undefined) {
+				if (typeof data[dy][tm] === "string") {
+					tmpArray = [data[dy][tm], line.trim()];
+					data[dy][tm] =  tmpArray;
+				} else {
+					data[dy][tm].push(line.trim());
+				}
 			}
 		});
 		
