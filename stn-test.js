@@ -47,7 +47,7 @@ Object.keys(sample1a).forEach(function (dy) {
 	assert.ok(result[dy] !== undefined, "missing from sample1 " + dy + " <-- " + util.inspect(sample1a[dy]));
 	Object.keys(sample1a[dy]).forEach(function (tm) {
 		assert.ok(result[dy][tm] !== undefined, 'sample1 ' + dy + ' -> ' + tm + ' missing in result ' + util.inspect(result[dy]));
-		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
+		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), 'mrs ' + dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
 	});
 });
 console.log("... No missing results");
@@ -59,7 +59,7 @@ Object.keys(result).forEach(function (dy) {
 	assert.ok(sample1a[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
 	Object.keys(result[dy]).forEach(function (tm) {
 		assert.ok(result[dy][tm] !== undefined, "result " + dy + ' -> ' + tm + " missing in simple1a " + util.inspect(sample1a[dy])); 
-		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
+		assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(), 'urs ' + dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() + '] !== [' + result[dy][tm].toString() + ']'); 
 	});
 });
 console.log("... No unexpected results");
