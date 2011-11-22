@@ -74,27 +74,50 @@ var self = {
 	 * pass the results to the callback method 
 	 * based on any options supplied.
 	 * @param: text - the plain text to parse
-	 * @param: callback - the function to call when complete
-	 * @param: options - an object with option properties to use
-	 * for determining the data argument handed to the callback
+	 * @param: callback - (optional) the function to call when complete
+	 * @param: options - (optional) an object with option properties to use
+	 * for determining the data argument handed to the callback or returned by parse
 	 * @returns a object representing the parsed data or false if
 	 * errors were found.
 	 */
 	parse : function (text, callback, options) {
+		if (options === undefined) {
+			options = self._defaults;
+		}
+		if (typeof callback === 'object') {
+			// options arg was folded over callback
+			Object.keys(callback).forEach(function (ky) {
+				options[ky] = callback[ky];
+			});
+		}
+
 		var lines, data = {}, dy, tm, tmpArray = [],
 			reDataEntry, reTimeEntry, reTime;
 
 		lines = text.replace(/\r/g,'').split("\n")
 		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
+		reDateNormalized = /[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/;
 		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
 		reTime = /[0-9]+:[0-5][0-9]/;
 
 		// Read through the text line, by line and create a new JSON
 		// blob
 		lines.forEach(function (line, i) {
+			var day, hrs1, hrs2, tmp;
+			
 			line = line.trim();
 			if (reDateEntry.exec(line)) {
-				dy = line.trim();
+				// FIXME: If options.normalize_date !== false, then noramlize date to format provided (e.g. MM/DD/YYYY or YYYY-MM-DD)
+				if (options.normalize_date === true) {
+					if (reDateNormalized.exec(line.trim())) {
+						dy = line.trim();
+					} else {
+						day = new Date(line.trim());
+						dy = day.getFullYear() + '-' + String("0" + (day.getMonth() + 1)).substr(-2) + '-' + String("0" + day.getDate()).substr(-2);
+					}
+				} else {
+					dy = line.trim();
+				}
 				data[dy] = {};
 			} else if (reTimeEntry.exec(line)) {
 				tm = (reTimeEntry.exec(line))[0].trim();
@@ -102,12 +125,28 @@ var self = {
 				if (tm.substr(-1) === ':' || 
 					tm.substr(-1) === ';' || 
 					tm.substr(-1) === ',') {
-                    // FIXME: If options.normalize_date !== false, then noramlize date to format provided (e.g. MM/DD/YYYY or YYYY-MM-DD)
 					tm = tm.slice(0,tm.length - 1).trim();
 				}
-                // FIXME: if options.tags === true  calculate tags field
-                // FIXME: if options.hours === true calculate hours field
-				data[dy][tm] = line.trim();
+				if (options.tags || options.hours) {
+					data[dy][tm] = {};
+					tmp = line.split(';');
+					data[dy][tm].notes = line.substr(tmp[0].length + 1).trim();
+					if (options.tags) {
+						data[dy][tm].tags = (tmp[0]).split(',');
+					}
+					hrs = tm.split(' - ');
+					hrs.forEach(function(val, i, times) { 
+						var hr = val.split(':'); 
+						times[i] = Number(hr[0]) + Number(hr[1]/60); 
+					});
+					if (hrs[0] < hrs[1]) {
+						data[dy][tm].hours = (hrs[1] - hrs[0]).toString();	
+					} else {
+						data[dy][tm].hours = (hrs[1] + (12 - hrs[0])).toString();
+					}
+                } else {
+					data[dy][tm] = line.trim();
+				}
 			}
 		});
 		
