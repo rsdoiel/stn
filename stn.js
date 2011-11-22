@@ -94,7 +94,7 @@ var self = {
 		var lines, data = {}, dy, tm, tmpArray = [],
 			reDataEntry, reTimeEntry, reTime;
 
-		lines = text.replace(/\r/g,'').split("\n")
+		lines = String(text).replace(/\r/g,'').split("\n")
 		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
 		reDateNormalized = /[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/;
 		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
