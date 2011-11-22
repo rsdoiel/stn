@@ -114,10 +114,12 @@ If you not using a twelve hour clock it is assume the first time before the dash
 
 Parsing a text file containing timesheet notation name test-samples/timesheet-1.txt
 
-	var stn = require('stn'), util = require('util');
+	var fs = require('fs'), 
+		util = require('util'),
+		stn = require('./stn');
 	
 	text = fs.readFileSync('test-samples/timesheet-1.txt');
-	results = stn.parse(text, {normalize_date:true, hours: true, tags: true);
+	results = stn.parse(text, {normalize_date:true, hours: true, tags: true});
 	console.log(util.inspect(results));
 
 Results would be a json object looking like test-samples/timesheet-1b.json.  You could then take this JSON blob and send it to a time system.
