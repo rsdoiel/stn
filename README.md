@@ -1,31 +1,20 @@
 Simple Timesheet Notation
 =========================
-revision 0.0.1-alpha
---------------------
+revision 0.0.1
+--------------
 
 # Overview
 
-Over the years of working I have found it necessary for various reasons to keep track of time spent on projects or activities.  Most recently these have been for billing and management purposes where I work. Every "tracking system" I've used has worked for me at some level accept one.  That is a simple ASCII log
-short hand I used to know what to enter in the "official systems" I've used.  The notation system that I have evolve maybe overly simple for many people but it is easy for me to read and easy to type while not making demands on me for calculations.
+I often found it necessary to keep track of time spent on projects or activities.  Every "tracking system" I've used has worked for me at some level accept one. I always forget to use them. I forget because they break the workflow.  I work with allot of text files so the system that works for me is a text file log. Over time I have simplified that format which has made it easy to enter, read or parsing in a program. This module is an implementation of my current practice of writing a simple timesheet notation.
 
-The system has evolved to leverage three things about my notes to myself
+Here's the summary view of the notation. Dates go in a single line by themselvesand are applied to all following time entries; time entries take up a single line and start with a time range;  Time ranges can be followed by "tags" which are terninated by a semi-colon if present;  the end of line terminates the entry description that will be submitted to the time system.  Text which is not part of a date or time entry is ignored by the parser and assumed to be extranious notes. This allows me to have working notes as well as time information in the same file.
 
-* Must time systems need to know the date something happens and I also normally know what the current date is
-* I can train myself to note the starting time when I'm working (or can figure it out easy enough in the moment of completing my work)
-* I can remember to use "now" as a place holder for the finish time and when I start the next task I usually can remember to replace "now" with the time of the task switch
-* I normally work less significantly less then twelve hours in a contiguous stretch of work so I can notate time in 12 hour format rather then 24 hour notation which always slows me down in typing after noon as pasted
-* I can use sort of short keyword(s) to know which project/activity the task is related to
-* I can keep short notes about the activity to help me later when I forgot what I was doing
-* Knowing when I started something and finished was more helpful then trying to member the number of hours and minutes I spent doing something
-* If you're passing the midnight boundary then you would create a new entry for a new day continuing your activity
 
-In free form this is problematic and labor intensive to re-input into most time tracking systems so I've evolved a short hand notation.
+# Notation details
 
-# the simple timesheet notation
+## Dates of entries
 
-## Finding the date that I did something
-
-A line which contains only a numerically formatted a date (.e.g. MM/DD/YYYYY or YYYY-MM-DD format) starts indicates the start of a log record for a particular day.  It is typed only once.  If I'm entering time for November 3, 2011 I would note it one a single line as 
+A line which contains only a numerically formatted a date (.e.g. MM/DD/YYYYY or YYYY-MM-DD format) indicates the start of a log entries for a particular day.  It is typed only once.  If I'm entering time for November 3, 2011 I would note it one a single line as 
 
 	11/03/2011
 
@@ -50,7 +39,7 @@ If could also look like this
 
 Any paragraphs of text that appear after the new line will be ignored until another time range or new date is encountered.
 
-# Example notation
+# Example timesheet notation
 
 In the following example is time entries for November 19, 2011 working on simple timesheet parsing project.
 
@@ -65,15 +54,15 @@ In the following example is time entries for November 19, 2011 working on simple
 	Realized I need to keep some backward compatibility for my parse so I don't have to rewrite/edit my ascii timesheet file.
 
 
-In the last entry starting with "Realized" the parse could either associate that entry with the 1:00 until 3:00 time range or just ignore it.  In my current job's time system they want only a short description so I just ignore it but it's in my log for my own benefits.
+In the last entry starting with "Realized" is skipped in parsing because it is neither a date or time entry.
 
-## notes on keeping it simple
+## Rational
 
-Over the years I use various ASCII notation systems to produce web pages for projects and the nice thing about Simple Timesheet Notation is that is very limited in it's assumption. It is limited enough to be quickly to typed while being easy to read.  It doesn't conflict with the ASCII notation system de-jour. E.g. This notation can co-exist in a Markdown or Textile format document.
+Over the years I've use various ASCII notation systems to produce web pages for projects and the nice thing about Simple Timesheet Notation is that is very limited in it's assumptions. It is limited enough to be quickly to typed while being easy to read.  It doesn't conflict with the ASCII notation system de-jour. E.g. This notation can co-exist in a Markdown or Textile format document.
 
 # output of notation
 
-In recent years I've found outputting data structure in JSON convenient regardless of programming language I'm working in. It seems like a good idea then to focus this document on what data structure would be produce rather then how to send this data into another system (that will very of course on the system being integrated, e.g. Harvest, Basecamp). The simplest useful JSON object generated from the previous example could look like
+In recent years I've found outputting data structures in JSON convenient regardless of programming language I'm working in. It seems like a good idea then to focus this module on generating JSON structures from the parsing process. Then wiring up the connection between a time tracking system (e.g. Basecamp, Harvest) is reasonably easy to do and maintain. The simplest useful JSON object generated from the previous example could look like
 
 	{
 		"11/19/2011": {		
@@ -86,22 +75,21 @@ In recent years I've found outputting data structure in JSON convenient regardle
 		}
 	}
 
-An alternative representation might look like
+This is find if I want to generate a summary for my own reading.  To be useful to a time tracking system I often need more. An alternative representation might look like
 
 	{
 		"11/19/2011": {		
 				"8:30 - 11:00": {
 					"project":"timesheet notation",
-					"notes": "Writing a README.md describing my simple timesheet notation." },
+					"notes": "Writing a README.md describing my simple timesheet notation.", "hours":"2.5","tags":["stn project"] },
 				"11:00 - 12:00": {
 					"project":"timesheet notation",
-					"notes": "Drafting a NodeJS example parser for the notation."},
+					"notes": "Drafting a NodeJS example parser for the notation.", "hours":"1", "tags":["stn project"]},
 				"1:00 - 3:00": {
 					"project":"timesheet notation",
-					"notes":[
-						"debugging parser, realizing I can simplify my notation further and drop the first semi-colon.",
-						"Realized I need to keep some backward compatibility for my parse so I don't have to rewrite/edit my ascii timesheet file."
-					]
+					"notes":"debugging parser, realizing I can simplify my notation further and drop the first semi-colon.",
+                    "hours":"2",
+                    "tags":["stn project"]}
 			}
 	}
 
@@ -121,10 +109,4 @@ posted to their API for adding a daily entry. A simple keyword(s) set can map to
 ## 12 hour versus 24 hour time notation
 
 If you not using a twelve hour clock it is assume the first time before the dash is the start time and the second entry is the end time.  Calculating hours then evolves looking at the relationship of those two times to each other.  If the start time is smaller then the end time then simple subtraction of the start from the end calculates hours spent.  If that is not the case (i.e. you have crossed the noon boundary) then you will need to normalize the values before subtracting the start from end time.
-
-
-
-
-
-
 
