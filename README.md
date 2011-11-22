@@ -110,3 +110,15 @@ posted to their API for adding a daily entry. A simple keyword(s) set can map to
 
 If you not using a twelve hour clock it is assume the first time before the dash is the start time and the second entry is the end time.  Calculating hours then evolves looking at the relationship of those two times to each other.  If the start time is smaller then the end time then simple subtraction of the start from the end calculates hours spent.  If that is not the case (i.e. you have crossed the noon boundary) then you will need to normalize the values before subtracting the start from end time.
 
+# Examples
+
+Parsing a text file containing timesheet notation name test-samples/timesheet-1.txt
+
+	var stn = require('stn'), util = require('util');
+	
+	text = fs.readFileSync('test-samples/timesheet-1.txt');
+	results = stn.parse(text, {normalize_date:true, hours: true, tags: true);
+	console.log(util.inspect(results));
+
+Results would be a json object looking like test-samples/timesheet-1b.json.  You could then take this JSON blob and send it to a time system.
+
