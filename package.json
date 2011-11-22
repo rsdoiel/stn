@@ -1,6 +1,6 @@
 {
 	"name" : "stn",
-	"version" : "0.0.1-alpha",
+	"version" : "0.0.1",
 	"description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
 	"main" : "./stn.js",
 	"repository" : {
