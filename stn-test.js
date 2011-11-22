@@ -30,7 +30,7 @@ try {
 }
 
 // Testing
-console.log("Checking module setup ...")
+console.log("Checking module setup ...");
 assert.strictEqual(typeof stn, 'object', "Should have an stn object: " + typeof stn);
 assert.strictEqual(typeof stn.parse, 'function', "Should have an stn.parse method on stn object: " + util.inspect(stn));
 

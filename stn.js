@@ -16,9 +16,9 @@ var util = require('util');
 var self = {
 	_msgs : [],
 	_defaults : {
-		notes:true,
+        normalize_date:false,
 		hours:false,
-		tags:false,
+		tags:false
 	},
 	/**
 	 * error - collect parse errors into the _msgs array.
@@ -102,18 +102,12 @@ var self = {
 				if (tm.substr(-1) === ':' || 
 					tm.substr(-1) === ';' || 
 					tm.substr(-1) === ',') {
+                    // FIXME: If options.normalize_date !== false, then noramlize date to format provided (e.g. MM/DD/YYYY or YYYY-MM-DD)
 					tm = tm.slice(0,tm.length - 1).trim();
 				}
-				data[dy][tm] = line;
-			} else if (line !== "" &&
-				data[dy] !== undefined &&
-				data[dy][tm] !== undefined) {
-				if (typeof data[dy][tm] === "string") {
-					tmpArray = [data[dy][tm], line.trim()];
-					data[dy][tm] =  tmpArray;
-				} else {
-					data[dy][tm].push(line.trim());
-				}
+                // FIXME: if options.tags === true  calculate tags field
+                // FIXME: if options.hours === true calculate hours field
+				data[dy][tm] = line.trim();
 			}
 		});
 		
