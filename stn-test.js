@@ -40,7 +40,7 @@ console.log("Checking parse method ...");
 result = stn.parse(sample1_text);
 assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
 
-console.log("Checking for missing results ...");
+console.log("Checking for missing results (mrs) ...");
 // Check for missing results
 Object.keys(sample1a).forEach(function (dy) {
 	var range, notes;
@@ -52,7 +52,7 @@ Object.keys(sample1a).forEach(function (dy) {
 });
 console.log("... No missing results");
 
-console.log("Checking for unexpected results ...");
+console.log("Checking for unexpected results (urs) ...");
 // Check for unexpected results 
 Object.keys(result).forEach(function (dy) {
 	var range, notes;
