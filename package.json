@@ -1,6 +1,6 @@
 {
 	"name" : "stn",
-	"version" : "0.0.1",
+	"version" : "0.0.2",
 	"description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
 	"main" : "./stn.js",
 	"repository" : {
@@ -23,7 +23,7 @@
 	"dependencies" : {
 	},
 	"scripts" : {
-		"test" : "node stn-test.js"
+		"test" : "node stn_test.js"
 	},
 	"bugs": {
 		"url": "http://github.com/rsdoiel/Simple-Timesheet-Notation/issues"
