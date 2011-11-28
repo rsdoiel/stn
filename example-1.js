@@ -4,4 +4,4 @@ var fs = require('fs'),
 
 text = fs.readFileSync('test-samples/timesheet-1.txt');
 results = stn.parse(text, {normalize_date:true, hours: true, tags: true});
-console.log(util.inspect(results));
+console.log(util.inspect(results, false, 4));
