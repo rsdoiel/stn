@@ -8,15 +8,14 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2-prototype
+// revision: 0.0.2
 //
 
 var	util = require('util'),
 	fs = require('fs'),
 	assert = require('assert'),
 	stn = require('./stn'),
-	sample1_text, sample1a, sample1b,
-	src;
+	sample1_text, sample1a, sample1b, result;
 
 console.log("Starting [stn-test.js] ...");
 
@@ -49,7 +48,6 @@ assert.ok(result, "Should get a non-false results from parsing sample1_text: " +
 console.log("Checking for missing results (mrs) ...");
 // Check for missing results
 Object.keys(sample1a).forEach(function (dy) {
-	var range, notes;
 	assert.ok(result[dy] !== undefined, "missing from sample1 " + dy + " <-- " + util.inspect(sample1a[dy]));
 	Object.keys(sample1a[dy]).forEach(function (tm) {
 		assert.ok(result[dy][tm] !== undefined, 'sample1 ' + dy + ' -> ' + tm + ' missing in result ' + util.inspect(result[dy]));
@@ -61,7 +59,6 @@ console.log("... No missing results");
 console.log("Checking for unexpected results (urs) ...");
 // Check for unexpected results 
 Object.keys(result).forEach(function (dy) {
-	var range, notes;
 	assert.ok(sample1a[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
 	Object.keys(result[dy]).forEach(function (tm) {
 		assert.ok(result[dy][tm] !== undefined, "result " + dy + ' -> ' + tm + " missing in simple1a " + util.inspect(sample1a[dy])); 
@@ -81,7 +78,6 @@ assert.ok(result, "Should get a non-false results from parsing sample1_text: " +
 console.log("Checking for missing results (mrs) ...");
 // Check for missing results
 Object.keys(sample1b).forEach(function (dy) {
-	var range, notes;
 	assert.ok(result[dy] !== undefined, "missing from sample1b [" + dy + "] <-- [" + util.inspect(sample1b[dy]) + "]");
 	//console.error("DEBUG result[" + dy + "]: " + util.inspect(result[dy]));// DEBUG
 	//console.error("DEBUG sample1b[" + dy + "]: " + util.inspect(sample1b[dy]));// DEBUG
@@ -97,7 +93,6 @@ console.log("... No missing results");
 console.log("Checking for unexpected results (urs) ...");
 // Check for unexpected results 
 Object.keys(result).forEach(function (dy) {
-	var range, notes;
 	assert.ok(sample1b[dy] !== undefined, "unexpected in result " + dy + " <-- " + util.inspect(result[dy])); 
 	Object.keys(result[dy]).forEach(function (tm) {
 		assert.ok(result[dy][tm] !== undefined, "result " + dy + ' -> ' + tm + " missing in simple1a " + util.inspect(sample1b[dy])); 

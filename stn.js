@@ -8,10 +8,8 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2-prototype
+// revision: 0.0.2
 //
-
-var util = require('util');
 
 var self = {
 	_msgs : [],
@@ -76,7 +74,8 @@ var self = {
 	 * @param: text - the plain text to parse
 	 * @param: callback - (optional) the function to call when complete
 	 * @param: options - (optional) an object with option properties to use
-	 * for determining the data argument handed to the callback or returned by parse
+	 * for determining the data argument handed to the callback or
+     * returned by parse
 	 * @returns a object representing the parsed data or false if
 	 * errors were found.
 	 */
@@ -91,10 +90,11 @@ var self = {
 			});
 		}
 
-		var lines, data = {}, dy, tm, tmpArray = [],
-			reDataEntry, reTimeEntry, reTime;
+		var lines, data = {}, dy, tm,
+			reDateEntry, reTimeEntry, reTime,
+            reDateNormalized;
 
-		lines = String(text).replace(/\r/g,'').split("\n")
+		lines = String(text).replace(/\r/g,'').split("\n");
 		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
 		reDateNormalized = /[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/;
 		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
@@ -103,7 +103,7 @@ var self = {
 		// Read through the text line, by line and create a new JSON
 		// blob
 		lines.forEach(function (line, i) {
-			var day, hrs1, hrs2, tmp;
+			var day, hrs, tmp;
 			
 			line = line.trim();
 			if (reDateEntry.exec(line)) {
