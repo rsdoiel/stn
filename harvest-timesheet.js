@@ -14,10 +14,10 @@
 //
 //
 
-var		util = require('util'),
-		crypto = require('crypto'),
-		fs = require('fs'),
-		md5 = function (data) {
+var util = require('util'), 
+	crypto = require('crypto'),
+	fs = require('fs'),
+	md5 = function (data) {
                 return crypto.createHash("md5").update(data).digest("hex");
         },
         opt = require("./options"),
@@ -27,6 +27,8 @@ var today = new Date(),
 	config, defaults = {
 	user : "johndoe@example.com",
 	password : "something-very-secret"	,
+	project_id: 1409928,
+	task_id: 87282,
 	start : today.getFullYear() + '-01-01',
 	end : today.getFullYear() + '-' + 
 			String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
@@ -94,15 +96,24 @@ opt.set('--timesheet', function (timesheet) {
 	config.timesheet = timesheet;
 }, "Set the name/path to the timesheet file to read. Defaults to ./Time_Sheet.txt");
 
+opt.set(['-p', '--project-id'], function (project_id) {
+	config.project_id = project_id;
+}, "Set the default project id to use.");
+
+opt.set(['-t', '--task-id'], function (task_id) {
+	config.task_id = task_id;
+}, "Set the default task id to use.");
+
 
 var push_event = function (config, msg, payload) {
+	var auth_string = new Buffer(config.user + ':' + config.password).toString('base64');
 	console.log([
 		"# " + msg,
 		"curl " + config.url + "/daily/add \\",
 		"\t-H 'Accept: application/json' \\",
 		"\t-H 'Content-Type: application/json' \\",
-		"\t-u " + config.user + ':' + config.password + " \\",
-		"\t-d '" + JSON.stringify(payload) + "'"
+		"\t-H 'Authorization: Basic " + auth_string.trim() + "' \\",
+		"\t-d '" + JSON.stringify(payload).replace(/'/g,"&#39;") + "'"
 	].join("\n") + "\n");
 };
 var format_dt = function (ymd) {
@@ -123,6 +134,7 @@ var in_range = function(config, dy) {
 	}
 	return false;
 };
+
 
 var run = function (config, msg) {
 	console.log([
@@ -146,8 +158,10 @@ var run = function (config, msg) {
 				if (in_range(config, dy)) {
 					sum += 1;
 					push_event(config, sum + ": " + dy + ", " + hr, {
-						notes: ([results[dy][hr].tags.join(', '), results[dy][hr].notes].join('; ')), hours:results[dy][hr].hours, 
-						project_id:"1409928", task_id:"87282",
+						notes: ([results[dy][hr].tags.join(', '), results[dy][hr].notes].join('; ')), 
+						hours: results[dy][hr].hours, 
+						project_id: config.project_id, 
+						task_id: config.task_id,
 						spent_at: format_dt(dy)
 					}); 
 				}
@@ -155,6 +169,35 @@ var run = function (config, msg) {
 		});
 console.log("# DEBUG config.start:" + config.start);
 console.log("# DEBUG config.end:" + config.end);
+	});
+};
+
+var run_csv = function(config) {
+	fs.readFile(config.timesheet, function (err, timesheet) {
+		if (err) throw err;
+		
+		var results = stn.parse(timesheet, {normalize_date:true, hours:true,tags:true});
+		console.log('"date","client","project","task","note","hours","first name","last name"');
+		Object.keys(results).forEach(function(dy) {
+			Object.keys(results[dy]).forEach(function (hr) {
+				if (in_range(config, dy)) {
+/*/*
+Eight columns for CSV file
+
+Date (YYYY-MM-DD or M/D/YYYY formats. For example: 2008-08-25 or 8/25/2008)
+Client
+Project
+Task
+Note
+Hours (in decimal form, without any stray characters. For example: 7.5, 3, 9.9)
+First name
+Last name
+
+/**/
+					console.log('"' + [dy, '@Web Services', "WS General FY12", "Misc", String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,'Robert','Doiel' ].join('","') + '"'); 
+				}
+			});
+		});
 	});
 };
 
@@ -176,7 +219,8 @@ console.log("# DEBUG config.end:" + config.end);
 				break;
 		}
 	});
-	run(config, msg);
+	//run(config, msg);
+	run_csv(config);
 }(process.argv));
 
 
