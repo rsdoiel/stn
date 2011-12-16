@@ -21,6 +21,7 @@
 		"npm" : ">= 1"
 	},
 	"dependencies" : {
+		"opt" : ">= 0.0.1"
 	},
 	"scripts" : {
 		"test" : "node stn_test.js"

@@ -13,7 +13,7 @@
 //
 
 var fs = require('fs'),
-	opt = require("./options"),
+	opt = require("opt"),
     stn = require('./stn');
 
 var today = new Date(),
@@ -27,7 +27,7 @@ var today = new Date(),
 	    end : today.getFullYear() + '-' + 
 			String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
 			String("0" + today.getDate()).substr(-2),
-        timesheet : "./timesheet.txt"
+        timesheet : false
 };
 
 // Use a default configuration file called config.js if available
@@ -44,7 +44,7 @@ Object.keys(defaults).forEach(function(ky) {
 });
 
 var USAGE = function () {
-	return "\n\n node harvest-timesheet.js -- process a simple timesheet log and send to Harvest.\n\n SYNOPSIS\n\n\t\tnode harvest-timesheet.js\t--firstname=john --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" --timesheet=timesheet.txt\n\n Processes the file called timesheet.txt in the current directory and sends to Harvest.";
+	return "\n\n node harvest-timesheet.js -- process a simple timesheet log and send to Harvest.\n\n SYNOPSIS\n\n\t\tnode harvest-timesheet.js\t--first-name=john --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" --timesheet=timesheet.txt\n\n Processes the file called timesheet.txt in the current directory and sends to Harvest.";
 };
 
 opt.set(['-h','--help'], function () {
@@ -97,7 +97,6 @@ opt.set(['-t', '--task-name'], function (task_name) {
 	config.task_name = task_name;
 }, "Set the default task name to use.");
 
-
 var in_range = function(config, dy) {
 	var start = Number(config.start.replace(/-/g,'')),
 		end = Number(config.end.replace(/-/g,'')),
@@ -109,6 +108,13 @@ var in_range = function(config, dy) {
 };
 
 var run_csv = function(config) {
+	if (! config.timesheet) {
+		console.error("\n WARNING: Missing timesheet file." + USAGE());
+		process.exit(1);
+	}
+	
+
+
 	fs.readFile(config.timesheet, function (err, timesheet) {
 		if (err) throw err;
 		
