@@ -1,6 +1,6 @@
 Simple Timesheet Notation
 =========================
-revision 0.0.1b
+revision 0.0.2
 ---------------
 
 # Overview
