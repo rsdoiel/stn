@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 //
 // harvest-csv.js - generate a CSV file suitable to import into Harvest.
 //
@@ -8,16 +9,17 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2
+// revision: 0.0.3
 //
 //
 
-var fs = require('fs'),
+var fs = require("fs"),
+	path = require("path"),
 	opt = require("opt"),
-    stn = require('./stn');
+    stn = require('stn');
 
 var today = new Date(),
-	config, defaults = {
+	config = {
         client:'ACME Web Productions, Inc.',
         project_name: 'General',
 	    task_name: 'Misc',
@@ -28,35 +30,19 @@ var today = new Date(),
 			String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
 			String("0" + today.getDate()).substr(-2),
         timesheet : false
-};
+	};
 
-// Use a default configuration file called config.js if available
-try {
-	config = require("./config");
-} catch(err) {
-	config = defaults;
-}
+// Use a default configuration file called config.json if available
+config = opt.configSync(config, [
+	"harvest.cnf",
+	path.join(process.env.HOME, "harvest.cnf"),
+	path.join(process.env.HOME, "Dropbox", "harvest.cnf")
+]);
 
-Object.keys(defaults).forEach(function(ky) {
-	if (config[ky] === undefined) {
-		config[ky] = defaults[ky];
-	}
-});
 
 var USAGE = function () {
 	return "\n\n node harvest-timesheet.js -- process a simple timesheet log and send to Harvest.\n\n SYNOPSIS\n\n\t\tnode harvest-timesheet.js\t--first-name=john --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" --timesheet=timesheet.txt\n\n Processes the file called timesheet.txt in the current directory and sends to Harvest.";
 };
-
-opt.set(['-h','--help'], function () {
-	var help = opt.help(), ky;
-
-	console.log(USAGE() + "\n\n OPTIONS\n");
-	for (ky in help) {
-		console.log("\t" + ky + "\t\t" + help[ky]);	
-	}
-	console.log("\n\n");
-	process.exit(0);
-}, "This help document.");
 
 opt.set(['-f', '--first-name'], function (first_name) {
 	config.first_name = first_name;
@@ -97,6 +83,34 @@ opt.set(['-t', '--task-name'], function (task_name) {
 	config.task_name = task_name;
 }, "Set the default task name to use.");
 
+opt.set(["-g", "--generate"], function (param) {
+	if (param) {
+		fs.writeFile(param, JSON.stringify(config), function (err) {
+			if (err) {
+				console.error(param, err);
+				process.exit(1);
+			}
+			process.exit(0);
+		});
+	} else {
+		console.log(JSON.stringify(config));
+		process.exit(0);
+	}
+}, "Generate a configuration file.\n\n");
+
+
+opt.set(['-h','--help'], function () {
+	var help = opt.help(), ky;
+
+	console.log(USAGE() + "\n\n OPTIONS\n");
+	for (ky in help) {
+		console.log("\t" + ky + "\t\t" + help[ky]);	
+	}
+	console.log("\n\n");
+	process.exit(0);
+}, "This help document.");
+
+
 var in_range = function(config, dy) {
 	var start = Number(config.start.replace(/-/g,'')),
 		end = Number(config.end.replace(/-/g,'')),
@@ -112,8 +126,6 @@ var run_csv = function(config) {
 		console.error("\n WARNING: Missing timesheet file." + USAGE());
 		process.exit(1);
 	}
-	
-
 
 	fs.readFile(config.timesheet, function (err, timesheet) {
 		if (err) throw err;
@@ -145,8 +157,8 @@ var run_csv = function(config) {
 
 
 // Main Logic
-(function (argv) {
+(function (argv, config) {
 	opt.parse(argv);
 	run_csv(config);
-}(process.argv));
+}(process.argv, config));
 
