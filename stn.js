@@ -8,50 +8,52 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2
+// revision: 0.0.3
 //
 
+/*jslint devel: true, node: true, maxerr: 10, indent: 4,  vars: true, sloppy: true, stupid: false */
+
 var self = {
-	_msgs : [],
-	_defaults : {
-        normalize_date:false,
-		hours:false,
-		tags:false
+	msgs : [],
+	defaults : {
+        normalize_date: false,
+		hours: false,
+		tags: false
 	},
 	/**
-	 * error - collect parse errors into the _msgs array.
+	 * error - collect parse errors into the msgs array.
 	 * @param msg - the message to the collection of messages.
 	 * @return true on successful add, false otherwise
 	 */
 	error : function (msg) {
-		var i = self._msgs.length;
-		
-		self._msgs.push('ERROR: ' + msg);
-		if ((i + 1) !== self._msgs.length) {
+		var i = self.msgs.length;
+
+		self.msgs.push('ERROR: ' + msg);
+		if ((i + 1) !== self.msgs.length) {
 			return false;
 		}
 		return true;
 	},
-	
+
 	/**
 	 * errorCount - number of error messages collected.
 	 * @return number of error messages.
 	 */
 	errorCount : function () {
-		if (self._msgs === undefined) {
+		if (self.msgs === undefined) {
 			return 0;
 		}
-		return self._msgs.length;
+		return self.msgs.length;
 	},
-	
+
 	/**
-	 * messages - return the _msgs array as a single string delimited
+	 * messages - return the msgs array as a single string delimited
 	 * by new lines.
 	 * @param no_clear (optional, defaults to false)
 	 * @return string representing in messages
 	 */
 	messages : function (no_clear) {
-		var result = self._msgs.join("\n");
+		var result = self.msgs.join("\n");
 
 		// set optional default i needed
 		if (no_clear !== undefined) {
@@ -63,7 +65,7 @@ var self = {
 		}
 
 		// Clear the messages
-		self._msgs = [];
+		self.msgs = [];
 		return result;
 	},
 
@@ -81,7 +83,7 @@ var self = {
 	 */
 	parse : function (text, callback, options) {
 		if (options === undefined) {
-			options = self._defaults;
+			options = self.defaults;
 		}
 		if (typeof callback === 'object') {
 			// options arg was folded over callback
@@ -94,7 +96,7 @@ var self = {
 			reDateEntry, reTimeEntry, reTime,
             reDateNormalized;
 
-		lines = String(text).replace(/\r/g,'').split("\n");
+		lines = String(text).replace(/\r/g, '').split("\n");
 		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
 		reDateNormalized = /[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/;
 		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
@@ -104,7 +106,7 @@ var self = {
 		// blob
 		lines.forEach(function (line, i) {
 			var day, hrs, tmp;
-			
+
 			line = line.trim();
 			if (reDateEntry.exec(line)) {
 				// FIXME: If options.normalize_date !== false, then noramlize date to format provided (e.g. MM/DD/YYYY or YYYY-MM-DD)
@@ -122,10 +124,8 @@ var self = {
 			} else if (reTimeEntry.exec(line)) {
 				tm = (reTimeEntry.exec(line))[0].trim();
 				line = line.substr(tm.length).trim();
-				if (tm.substr(-1) === ':' || 
-					tm.substr(-1) === ';' || 
-					tm.substr(-1) === ',') {
-					tm = tm.slice(0,tm.length - 1).trim();
+				if (tm.substr(-1) === ':' || tm.substr(-1) === ';' || tm.substr(-1) === ',') {
+					tm = tm.slice(0, tm.length - 1).trim();
 				}
 				if (options.tags || options.hours) {
 					data[dy][tm] = {};
@@ -135,12 +135,12 @@ var self = {
 						data[dy][tm].tags = (tmp[0]).split(',');
 					}
 					hrs = tm.split(' - ');
-					hrs.forEach(function(val, i, times) { 
-						var hr = val.split(':'); 
-						times[i] = Number(hr[0]) + Number(hr[1]/60); 
+					hrs.forEach(function (val, i, times) {
+						var hr = val.split(':');
+						times[i] = Number(hr[0]) + Number(hr[1] / 60);
 					});
 					if (hrs[0] < hrs[1]) {
-						data[dy][tm].hours = (hrs[1] - hrs[0]).toString();	
+						data[dy][tm].hours = (hrs[1] - hrs[0]).toString();
 					} else {
 						data[dy][tm].hours = (hrs[1] + (12 - hrs[0])).toString();
 					}
@@ -149,10 +149,10 @@ var self = {
 				}
 			}
 		});
-		
+
 		// If options.hours, options.notes true then processing
 		// into a more complex object tree.
-				
+
 		// Finished parse, return the results
 		if (callback !== undefined && typeof callback === 'function') {
 			if (self.errorCount() === 0) {
@@ -161,7 +161,7 @@ var self = {
 				callback(self.messages(), data, options);
 			}
 		}
-		
+
 		if (self.errorCount() > 0) {
 			return false;
 		}
