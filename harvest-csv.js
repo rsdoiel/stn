@@ -16,7 +16,7 @@
 var fs = require("fs"),
 	path = require("path"),
 	opt = require("opt"),
-    stn = require('stn');
+    stn = require('./stn');
 
 var today = new Date(),
 	config = {
@@ -84,9 +84,9 @@ opt.set(['-t', '--task-name'], function (task_name) {
 	config.task_name = task_name;
 }, "Set the default task name to use.");
 
-opt.set(['-m', '--content-map'], function (map_name) {
+opt.set(['-m', '--map'], function (map_name) {
 	config.map_name = map_name;
-}, "Parse the time entry for a key to set the task and project name from. keyword is delimited by semi-colon.");
+}, "Lookup the entry's tags in map and set client_name, task and project_name if found.");
 
 
 opt.set(["-g", "--generate"], function (param) {
@@ -133,17 +133,16 @@ var run_csv = function(config) {
 		process.exit(1);
 	}
 	
+	config.map = false;
 	if (config.map_name !== false) {
 		config.map = JSON.parse(fs.readFileSync(config.map_name).toString());
-	} else {
-		config.map = false;
 	}
 
 	fs.readFile(config.timesheet, function (err, timesheet) {
 		if (err) throw err;
 		
 		var results = stn.parse(timesheet,
-                {normalize_date:true, hours:true,tags:true, content_map: config.map});
+                {normalize_date: true, hours: true, tags: true, map: config.map});
         /* Eight columns for CSV file
 
             Date (YYYY-MM-DD or M/D/YYYY formats. For example: 2008-08-25 or 8/25/2008)
@@ -160,8 +159,8 @@ var run_csv = function(config) {
 		Object.keys(results).forEach(function(dy) {
 			Object.keys(results[dy]).forEach(function (hr) {
 				if (in_range(config, dy)) {
-					if (config.map !== false) {
-						console.log('"' + [dy, results[dy][hr].client_name, results[dy][hr].project_name, results[dy][hr].task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+					if (results[dy][hr].map !== false) {
+						console.log('"' + [dy, results[dy][hr].map.client_name, results[dy][hr].map.project_name, results[dy][hr].map.task, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
 					} else {
 						console.log('"' + [dy, config.client_name, config.project_name, config.task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
 					}

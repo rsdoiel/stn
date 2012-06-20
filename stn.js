@@ -134,7 +134,7 @@ var self = {
 				if (tm.substr(-1) === ':' || tm.substr(-1) === ';' || tm.substr(-1) === ',') {
 					tm = tm.slice(0, tm.length - 1).trim();
 				}
-				if (options.tags || options.hours) {
+				if (options.tags || options.hours || options.map) {
 					data[dy][tm] = {};
 					data[dy][tm].map = false;
 					tmp = line.split(';');
