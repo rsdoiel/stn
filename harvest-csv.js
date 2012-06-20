@@ -29,7 +29,8 @@ var today = new Date(),
 	    end : today.getFullYear() + '-' + 
 			String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
 			String("0" + today.getDate()).substr(-2),
-        timesheet : false
+        timesheet : false,
+        map_name: false
 	};
 
 // Use a default configuration file called config.json if available
@@ -83,6 +84,11 @@ opt.set(['-t', '--task-name'], function (task_name) {
 	config.task_name = task_name;
 }, "Set the default task name to use.");
 
+opt.set(['-m', '--content-map'], function (map_name) {
+	config.map_name = map_name;
+}, "Parse the time entry for a key to set the task and project name from. keyword is delimited by semi-colon.");
+
+
 opt.set(["-g", "--generate"], function (param) {
 	if (param) {
 		fs.writeFile(param, JSON.stringify(config), function (err) {
@@ -126,12 +132,18 @@ var run_csv = function(config) {
 		console.error("\n WARNING: Missing timesheet file." + USAGE());
 		process.exit(1);
 	}
+	
+	if (config.map_name !== false) {
+		config.map = JSON.parse(fs.readFileSync(config.map_name).toString());
+	} else {
+		config.map = false;
+	}
 
 	fs.readFile(config.timesheet, function (err, timesheet) {
 		if (err) throw err;
 		
 		var results = stn.parse(timesheet,
-                {normalize_date:true, hours:true,tags:true});
+                {normalize_date:true, hours:true,tags:true, content_map: config.map});
         /* Eight columns for CSV file
 
             Date (YYYY-MM-DD or M/D/YYYY formats. For example: 2008-08-25 or 8/25/2008)
@@ -148,7 +160,11 @@ var run_csv = function(config) {
 		Object.keys(results).forEach(function(dy) {
 			Object.keys(results[dy]).forEach(function (hr) {
 				if (in_range(config, dy)) {
-					console.log('"' + [dy, config.client_name, config.project_name, config.task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+					if (config.map !== false) {
+						console.log('"' + [dy, results[dy][hr].client_name, results[dy][hr].project_name, results[dy][hr].task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+					} else {
+						console.log('"' + [dy, config.client_name, config.project_name, config.task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+					}
 				}
 			});
 		});

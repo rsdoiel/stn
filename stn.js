@@ -18,7 +18,8 @@ var self = {
 	defaults : {
         normalize_date: false,
 		hours: false,
-		tags: false
+		tags: false,
+		map: false
 	},
 	/**
 	 * error - collect parse errors into the msgs array.
@@ -84,6 +85,12 @@ var self = {
 	parse : function (text, callback, options) {
 		if (options === undefined) {
 			options = self.defaults;
+		} else {
+			Object.keys(self.defaults).forEach(function (ky) {
+				if (options[ky] === undefined) {
+					options[ky] = self.defaults[ky];
+				}
+			});
 		}
 		if (typeof callback === 'object') {
 			// options arg was folded over callback
@@ -129,10 +136,16 @@ var self = {
 				}
 				if (options.tags || options.hours) {
 					data[dy][tm] = {};
+					data[dy][tm].map = false;
 					tmp = line.split(';');
 					data[dy][tm].notes = line.substr(tmp[0].length + 1).trim();
 					if (options.tags) {
 						data[dy][tm].tags = (tmp[0]).split(',');
+					}
+					if (options.map !== false &&
+						tmp[0] !== undefined &&
+						options.map[tmp[0]] !== undefined) {
+						data[dy][tm].map = options.map[tmp[0]];
 					}
 					hrs = tm.split(' - ');
 					hrs.forEach(function (val, i, times) {
