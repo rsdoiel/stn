@@ -16,7 +16,7 @@
 var fs = require("fs"),
 	path = require("path"),
 	opt = require("opt"),
-    stn = require('./stn');
+	stn = require('stn');
 
 var today = new Date(),
 	config = {
