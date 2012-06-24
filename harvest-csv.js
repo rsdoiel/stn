@@ -15,7 +15,7 @@
 
 var fs = require("fs"),
 	path = require("path"),
-	opt = require("opt"),
+	opt = require("opt").create(),
 	stn = require('stn');
 
 var today = new Date(),
@@ -42,18 +42,18 @@ config = opt.configSync(config, [
 
 
 var USAGE = function () {
-	return "\n\n node harvest-timesheet.js -- process a simple timesheet log and send to Harvest.\n\n SYNOPSIS\n\n\t\tnode harvest-timesheet.js\t--first-name=john --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" --timesheet=timesheet.txt\n\n Processes the file called timesheet.txt in the current directory and sends to Harvest.";
+	return "\n\n node harvest-timesheet.js -- process a simple timesheet log and send to Harvest.\n\n SYNOPSIS\n\n\t\tnode harvest-timesheet.js\t--first=john --last=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" --timesheet=timesheet.txt\n\n Processes the file called timesheet.txt in the current directory and sends to Harvest.";
 };
 
-opt.set(['-f', '--first-name'], function (first_name) {
+opt.set(['-f', '--first'], function (first_name) {
 	config.first_name = first_name;
 }, "Set the first name column contents. E.g. John");
 
-opt.set(['-l', '--last-name'], function (last_name) {
+opt.set(['-l', '--last'], function (last_name) {
     config.last_name = last_name;
 }, "Set the last name column contents. E.g. Doe");
 
-opt.set(['-c', '--client-name'], function (client_name) {
+opt.set(['-c', '--client'], function (client_name) {
     config.client_name = client_name;
 }, "Set the last name column contents. E.g. ACME Web Products, inc.");
 
@@ -76,11 +76,11 @@ opt.set('--timesheet', function (timesheet) {
 	config.timesheet = timesheet;
 }, "Set the name/path to the timesheet file to read. Defaults to ./Time_Sheet.txt");
 
-opt.set(['-p', '--project-name'], function (project_name) {
+opt.set(['-p', '--project'], function (project_name) {
 	config.project_name = project_name;
 }, "Set the default project name to use.");
 
-opt.set(['-t', '--task-name'], function (task_name) {
+opt.set(['-t', '--task'], function (task_name) {
 	config.task_name = task_name;
 }, "Set the default task name to use.");
 
@@ -106,14 +106,7 @@ opt.set(["-g", "--generate"], function (param) {
 
 
 opt.set(['-h','--help'], function () {
-	var help = opt.help(), ky;
-
-	console.log(USAGE() + "\n\n OPTIONS\n");
-	for (ky in help) {
-		console.log("\t" + ky + "\t\t" + help[ky]);	
-	}
-	console.log("\n\n");
-	process.exit(0);
+    opt.usage();
 }, "This help document.");
 
 
