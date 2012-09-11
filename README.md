@@ -1,13 +1,13 @@
-Simple Timesheet Notation
-=========================
-revision 0.0.2
----------------
+[![build status](https://secure.travis-ci.org/rsdoiel/opt.png)](http://travis-ci.org/rsdoiel/opt)
+stn - Simple Timesheet Notation
+===============================
+
 
 # Overview
 
 I've often found it necessary to keep track of time spent on projects or activities.  Every "tracking system" I've used has worked for me at some level accept one. I always forget to use them. I forget because they break the workflow.  I work with allot of text files so the system that works for me is a text file log. Over time I have simplified that format which has made it easy to enter, read or parsing in a program. This module is an implementation of my current practice of writing a simple timesheet notation.
 
-Here's the summary view of the notation. Dates go in a single line by themselvesand are applied to all following time entries; time entries take up a single line and start with a time range;  Time ranges can be followed by "tags" which are terninated by a semi-colon if present;  the end of line terminates the entry description that will be submitted to the time system.  Text which is not part of a date or time entry is ignored by the parser and assumed to be extranious notes. This allows me to have working notes as well as time information in the same file.
+Here's the summary view of the notation. Dates go in a single line by themselves and are applied to all following time entries; time entries take up a single line and start with a time range;  Time ranges can be followed by "tags" which are terminated by a semi-colon if present;  the end of line terminates the entry description that will be submitted to the time system.  Text which is not part of a date or time entry is ignored by the parser and assumed to be extraneous notes. This allows me to have working notes as well as time information in the same file.
 
 
 # Notation details
