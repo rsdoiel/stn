@@ -1,4 +1,4 @@
-[![build status](https://secure.travis-ci.org/rsdoiel/opt.png)](http://travis-ci.org/rsdoiel/opt)
+[![build status](https://secure.travis-ci.org/rsdoiel/stn.png)](http://travis-ci.org/rsdoiel/stn)
 stn - Simple Timesheet Notation
 ===============================
 
