@@ -22,7 +22,7 @@
 	},
 	"dependencies": {
 			"harness": ">= 0.0.3",
-			"opt": ">= 1.1.0"
+			"opt": ">= 0.1.1"
 	},
 	"scripts" : {
 		"test" : "node stn_test.js"
