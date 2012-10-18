@@ -1,4 +1,4 @@
-//#!/usr/bin/env node
+#!/usr/bin/env node
 //
 // harvest-csv.js - generate a CSV file suitable to import into Harvest.
 //
