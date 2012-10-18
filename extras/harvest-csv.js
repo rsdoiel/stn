@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+//#!/usr/bin/env node
 //
 // harvest-csv.js - generate a CSV file suitable to import into Harvest.
 //
@@ -9,8 +9,7 @@
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.5
-//
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
 	path = require("path"),
@@ -19,13 +18,13 @@ var fs = require("fs"),
 
 var today = new Date(),
 	config = {
-        client:'ACME Web Productions, Inc.',
+        client: 'ACME Web Productions, Inc.',
         project_name: 'General',
 	    task_name: 'Misc',
         first_name: 'John',
         last_name: 'Doe',
         start : today.getFullYear() + '-01-01',
-	    end : today.getFullYear() + '-' + 
+	    end : today.getFullYear() + '-' +
 			String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
 			String("0" + today.getDate()).substr(-2),
         timesheet : false,
@@ -60,16 +59,16 @@ opt.on("ready", function (config) {
 		config.client_name = client_name;
 	}, "Set the last name column contents. E.g. ACME Web Products, inc.");
 	
-	opt.option(['-s','--start'], function(start_date) {
+	opt.option(['-s', '--start'], function (start_date) {
 		config.start = start_date;
 	}, "Set the start date for reporting in YYYY-MM-DD format.");
 	
-	opt.option(['-e','--end'], function(end_date) {
-		if (end_date.length == 10 &&
-			end_date.match(/20[0-2][0-9]-[0-3][0-9]-[0-3][0-9]/)) {
+	opt.option(['-e', '--end'], function (end_date) {
+		if (end_date.length === 10 &&
+				end_date.match(/20[0-2][0-9]-[0-3][0-9]-[0-3][0-9]/)) {
 			config.end = end_date;
 		} else {
-			config.end = today.getFullYear() + '-' + 
+			config.end = today.getFullYear() + '-' +
 				String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
 				String("0" + (today.getDate())).substr(-2);
 		}
@@ -108,23 +107,23 @@ opt.on("ready", function (config) {
 	}, "Generate a configuration file.\n\n");
 	
 	
-	opt.option(['-h','--help'], function () {
+	opt.option(['-h', '--help'], function () {
 		opt.usage();
 	}, "This help document.");
 	
 	
-	var in_range = function(config, dy) {
-		var start = Number(config.start.replace(/-/g,'')),
-			end = Number(config.end.replace(/-/g,'')),
-			cur = Number(dy.replace(/-/g,''));
+	var in_range = function (config, dy) {
+		var start = Number(config.start.replace(/-/g, '')),
+			end = Number(config.end.replace(/-/g, '')),
+			cur = Number(dy.replace(/-/g, ''));
 		if (cur >= start && cur <= end) {
 			return true;
 		}
 		return false;
 	};
 	
-	var run_csv = function(config) {
-		if (! config.timesheet) {
+	var run_csv = function (config) {
+		if (!config.timesheet) {
 			console.error("\n WARNING: Missing timesheet file." + opt.usage());
 			process.exit(1);
 		}
@@ -135,8 +134,9 @@ opt.on("ready", function (config) {
 		}
 	
 		fs.readFile(config.timesheet, function (err, timesheet) {
-			if (err) throw err;
-			
+			if (err) {
+				throw err;
+			}
 			var results = stn.parse(timesheet,
 					{normalize_date: true, hours: true, tags: true, map: config.map});
 			/* Eight columns for CSV file
@@ -152,13 +152,38 @@ opt.on("ready", function (config) {
 			*/
 	
 			console.log('"date","client","project","task","note","hours","first name","last name"');
-			Object.keys(results).forEach(function(dy) {
+			Object.keys(results).forEach(function (dy) {
 				Object.keys(results[dy]).forEach(function (hr) {
 					if (in_range(config, dy)) {
 						if (results[dy][hr].map !== false) {
-							console.log('"' + [dy, results[dy][hr].map.client_name, results[dy][hr].map.project_name, results[dy][hr].map.task, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+							console.log('"' + [
+								dy, results[dy][hr].map.client_name,
+								results[dy][hr].map.project_name,
+								results[dy][hr].map.task,
+								String([
+									results[dy][hr].tags.join(', '),
+									" ",
+									results[dy][hr].notes
+								].join(' ')).replace(/"/g, '&quot;').trim(),
+								results[dy][hr].hours,
+								config.first_name,
+								config.last_name
+							].join('","') + '"');
 						} else {
-							console.log('"' + [dy, config.client_name, config.project_name, config.task_name, String([results[dy][hr].tags.join(', ') + " " + results[dy][hr].notes].join(' ')).replace(/"/g,'&quot;').trim(), results[dy][hr].hours,config.first_name,config.last_name ].join('","') + '"'); 
+							console.log('"' + [
+								dy,
+								config.client_name,
+								config.project_name,
+								config.task_name,
+								String([
+									results[dy][hr].tags.join(', '),
+									" ",
+									results[dy][hr].notes
+								].join(' ')).replace(/"/g, '&quot;').trim(),
+								results[dy][hr].hours,
+								config.first_name,
+								config.last_name
+							].join('","') + '"');
 						}
 					}
 				});

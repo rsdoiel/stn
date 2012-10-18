@@ -8,10 +8,7 @@
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.5
-//
-
-/*jslint devel: true, node: true, maxerr: 10, indent: 4,  vars: true, sloppy: true, stupid: false */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var self = {
 	msgs : [],
@@ -143,8 +140,8 @@ var self = {
 						data[dy][tm].tags = (tmp[0]).split(',');
 					}
 					if (options.map !== false &&
-						tmp[0] !== undefined &&
-						options.map[tmp[0]] !== undefined) {
+							tmp[0] !== undefined &&
+							options.map[tmp[0]] !== undefined) {
 						data[dy][tm].map = options.map[tmp[0]];
 					}
 					hrs = tm.split(' - ');
