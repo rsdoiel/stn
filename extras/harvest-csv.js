@@ -193,7 +193,7 @@ opt.on("ready", function (config) {
 	
 	// Main Logic
 	(function (argv, config) {
-		opt.parse(argv);
+		opt.optionWith(argv);
 		run_csv(config);
 	}(process.argv, config));
 });
