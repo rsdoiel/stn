@@ -1,0 +1,26 @@
+2012-11-02
+
+8:00 - 12:15; M101 MongoDB for Developers class
+
+12:15 - 3:45; M102 MongoDB for Admins
+
+
+2012-11-01
+
+6:30 - 8:30; professional development; M101 MongoDB Developer course
+
+8:50 - 9:50; news search; implement higher performance JSON API with MongoDB
+
+11:00 - 2:00; event calendar; Setup for relink test
+
+2:30 - 4:30; news search; implementing a higher performance JSON API with MongoDB
+
+
+2012-10-31
+
+6:30 - 7:30; professional development; M101 MongoDB for developers
+
+9:30 - 12:00; Setup ecal in my sandbox, run relink-event-images.js. Write SPA so Ian, Candy and Sam can review the results. Improve USC object's support for calendar rendering.
+
+1:00 - 4:45; Write SPA so calendar content can be debugged against eo3 API. Got debug page working.
+
