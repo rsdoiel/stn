@@ -21,7 +21,7 @@ text = fs.readFileSync('test-samples/timesheet-2.txt').toString();
 // Parse some more data.
 timesheet.parse(text);
 // Add an entry with explicit fields
-timesheet.addEntry({date: now, start: (now - 100000), end: now, tags: ["demo"], notes: "This is me, using this software."});
+timesheet.addEntry({date: now, start: Number(now.getTime() - 100000), end: now, tags: ["demo"], notes: "This is me, using this software."});
 
 /* We can also add entries by passing short strings. 
 	Let's try something like
@@ -35,6 +35,8 @@ line = "2012-11-03";
 timesheet.addEntry(line);
 line = "08:00 - 9:00; staff meeting";
 timesheet.addEntry(line);
+// How let's display the revised contents based on
+// the toString() rendering
 console.log(timesheet.toString());
 console.log("");
 

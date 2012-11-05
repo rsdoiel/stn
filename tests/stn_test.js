@@ -187,11 +187,39 @@ harness.push({callback: basicTests, label: "Basic tests"});
 harness.push({callback: mapTests, label: "Map tests"});
 
 harness.push({callback: function (test_label) {
-	var STN = new stn.Stn();
+	var STN = new stn.Stn(),
+		line;
 	
-	assert.equal(STN.save_parse, false, "Should NOT have save_parse.");
+	assert.equal(STN.defaults.save_parse, false, "Should NOT have save_parse.");
 	STN.reset();
-	assert.equal(STN.save_parse, true, "Should have save_parse.");
+	assert.equal(STN.defaults.save_parse, true, "Should have save_parse.");
+	val = STN.valueOf();
+	assert.equal(Object.keys(val).length, 0,"Should have nothing in the parse tree");
+	line = "2012-11-06";
+	STN.addEntry(line);
+	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
+	assert.equal(Object.keys(val).length, 0,"Should have nothing in the parse tree");
+	line = "8:00 - 10:00; staff meeting";
+	STN.addEntry(line);
+	val = STN.valueOf();
+	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
+	assert.equal(Object.keys(val).length, 1,"Should have nothing in the parse tree");
+	assert.notEqual(typeof val["2012-11-06"], "undefined", "Should have a date record now");
+	assert.notEqual(typeof val["2012-11-06"]["8:00 - 10:00"], "undefined", "Should have a time part of the record: " + util.inspect(val));
+
+	assert.equal(val["2012-11-06"]["8:00 - 10:00"].map, false, "Should *.map === false: " + util.inspect(val));
+
+	assert.equal(val["2012-11-06"]["8:00 - 10:00"].tags[0], "staff meeting", "Should *.tags[0] === 'staff meeting': " + util.inspect(val));
+
+	assert.equal(val["2012-11-06"]["8:00 - 10:00"].notes, "", "Should *.notes === '': " + util.inspect(val));
+	
+	line = "2:30 - 4:30; weekly; with Boss";
+	STN.addEntry(line);
+	assert.equal(val["2012-11-06"]["2:30 - 4:30"].map, false, "Should *.map === false: " + util.inspect(val));
+
+	assert.equal(val["2012-11-06"]["2:30 - 4:30"].tags[0], "weekly", "Should *.tags[0] === 'staff meeting': " + util.inspect(val));
+
+	assert.equal(val["2012-11-06"]["2:30 - 4:30"].notes, "with Boss", "Should *.notes === 'with Boss': " + util.inspect(val));
 	
 	harness.completed(test_label);
 }, label: "Tests incremental parsing"});

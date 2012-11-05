@@ -412,27 +412,45 @@ var addEntry = function (entry, callback, options) {
 // Format a date as YYYY-MM-DD
 // @param Date object
 // @return string in YYYY-MM-DD format
-var YYYYMMDD = function (d) {
-	if (typeof d === "string" || typeof d === "number") {
+var YYYYMMDD = function (d, use_UTC) {
+	if (typeof d === "string") {
+		if  (d.match(/[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/)) {
+			return d.replace(/\s+/, "");
+		}
+		d = new Date(d);
+	} else if (typeof d === "number") {
 		d = new Date(d);
 	} else if (typeof d !== "object" &&
 			typeof d.getFullYear !== "function") {
 		throw "Expecting type: " + String(d) + " --> " + typeof d;
 	}
+	if (!use_UTC) {
+		return [
+			d.getFullYear(),
+			String("0" + (d.getMonth() + 1)).substr(-2),
+			String("0" + d.getDate()).substr(-2)
+		].join("-");
+	}
 	return [
-		d.getFullYear(),
-		String("0" + (d.getMonth() + 1)).substr(-2),
-		String("0" + d.getDate()).substr(-2)
+		d.getUTCFullYear(),
+		String("0" + (d.getUTCMonth() + 1)).substr(-2),
+		String("0" + d.getUTCDate()).substr(-2)
 	].join("-");
 };
 
 // Fromat time as HH:MM
 // @param Date object
 // @return string in HH:MM format
-var HHMM = function (t) {
+var HHMM = function (t, use_UTC) {
+	if (!use_UTC) { 
+		return [
+			String("0" + t.getHours()).substr(-2),
+			String("0" + t.getMinutes()).substr(-2)
+		].join(":");
+	}
 	return [
-		String("0" + t.getHours()).substr(-2),
-		String("0" + t.getMinutes()).substr(-2)
+		String("0" + t.getUTCHours()).substr(-2),
+		String("0" + t.getUTCMinutes()).substr(-2)
 	].join(":");
 };
 
