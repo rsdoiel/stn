@@ -11,6 +11,52 @@
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 var util = require("util");
 
+
+// Format a date as YYYY-MM-DD
+// @param Date object
+// @return string in YYYY-MM-DD format
+var YYYYMMDD = function (d, use_UTC) {
+	if (typeof d === "string") {
+		if (d.match(/[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/)) {
+			return d.replace(/\s+/, "");
+		}
+		d = new Date(d);
+	} else if (typeof d === "number") {
+		d = new Date(d);
+	} else if (typeof d !== "object" &&
+			typeof d.getFullYear !== "function") {
+		throw "Expecting type: " + String(d) + " --> " + typeof d;
+	}
+	if (!use_UTC) {
+		return [
+			d.getFullYear(),
+			String("0" + (d.getMonth() + 1)).substr(-2),
+			String("0" + d.getDate()).substr(-2)
+		].join("-");
+	}
+	return [
+		d.getUTCFullYear(),
+		String("0" + (d.getUTCMonth() + 1)).substr(-2),
+		String("0" + d.getUTCDate()).substr(-2)
+	].join("-");
+};
+
+// Fromat time as HH:MM
+// @param Date object
+// @return string in HH:MM format
+var HHMM = function (t, use_UTC) {
+	if (!use_UTC) {
+		return [
+			String("0" + t.getHours()).substr(-2),
+			String("0" + t.getMinutes()).substr(-2)
+		].join(":");
+	}
+	return [
+		String("0" + t.getUTCHours()).substr(-2),
+		String("0" + t.getUTCMinutes()).substr(-2)
+	].join(":");
+};
+
 // reset - clear the parse tree
 // sets save_parse to true,
 // sets normalize_date to true
@@ -19,6 +65,8 @@ var util = require("util");
 // @param options - a set of options to override the defaults with
 // on reset.
 var reset = function (options) {
+	var ky;
+
 	this.defaults = {};
 	this.defaults.normalize_date = true;
 	this.defaults.save_parse = true;
@@ -292,7 +340,7 @@ var toString = function () {
 						rec.map !== false) {
 					maps = [
 						rec.map.project_name,
-						rec.map.task,
+						rec.map.task
 					].join(", ") + "; ";
 				}
 				if (typeof rec.tags !== "undefined" &&
@@ -340,7 +388,7 @@ var addEntry = function (entry, callback, options) {
 		}
 	} else if (typeof entry === "object") {
 		// Make sure we have all the fields.
-		switch(typeof entry.date) {
+		switch (typeof entry.date) {
 		case 'object':
 			if (typeof entry.date === "object" &&
 					typeof entry.date.getFullYear === "function") {
@@ -351,14 +399,14 @@ var addEntry = function (entry, callback, options) {
 			break;
 		case 'number':
 			day = new Date(entry.date);
-			entry.date = YYYMMDD(day);
+			entry.date = YYYYMMDD(day);
 			break;
 		case 'undefined':
 			entry.date = dy;
 			break;
 		}
 		
-		switch(typeof entry.start) {
+		switch (typeof entry.start) {
 		case 'object':
 			if (typeof entry.start === "object" &&
 					typeof entry.start.getHours === "function") {
@@ -375,7 +423,7 @@ var addEntry = function (entry, callback, options) {
 			break;
 		}
 
-		switch(typeof entry.end) {
+		switch (typeof entry.end) {
 		case 'object':
 			if (typeof entry.end === "object" &&
 					typeof entry.end.getHours === "function") {
@@ -429,50 +477,6 @@ var addEntry = function (entry, callback, options) {
 	return result;
 };
 
-// Format a date as YYYY-MM-DD
-// @param Date object
-// @return string in YYYY-MM-DD format
-var YYYYMMDD = function (d, use_UTC) {
-	if (typeof d === "string") {
-		if  (d.match(/[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/)) {
-			return d.replace(/\s+/, "");
-		}
-		d = new Date(d);
-	} else if (typeof d === "number") {
-		d = new Date(d);
-	} else if (typeof d !== "object" &&
-			typeof d.getFullYear !== "function") {
-		throw "Expecting type: " + String(d) + " --> " + typeof d;
-	}
-	if (!use_UTC) {
-		return [
-			d.getFullYear(),
-			String("0" + (d.getMonth() + 1)).substr(-2),
-			String("0" + d.getDate()).substr(-2)
-		].join("-");
-	}
-	return [
-		d.getUTCFullYear(),
-		String("0" + (d.getUTCMonth() + 1)).substr(-2),
-		String("0" + d.getUTCDate()).substr(-2)
-	].join("-");
-};
-
-// Fromat time as HH:MM
-// @param Date object
-// @return string in HH:MM format
-var HHMM = function (t, use_UTC) {
-	if (!use_UTC) { 
-		return [
-			String("0" + t.getHours()).substr(-2),
-			String("0" + t.getMinutes()).substr(-2)
-		].join(":");
-	}
-	return [
-		String("0" + t.getUTCHours()).substr(-2),
-		String("0" + t.getUTCMinutes()).substr(-2)
-	].join(":");
-};
 
 Stn.prototype.valueOf = valueOf;
 Stn.prototype.toString = toString;

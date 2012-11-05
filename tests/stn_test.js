@@ -15,7 +15,7 @@ var	util = require('util'),
 	path = require("path"),
 	assert = require('assert'),
 	harness = require("harness"),
-	stn = new require('../stn'),
+	stn = require('../stn'),
 	test_name = "tests/stn_test.js",
 	sample1_text,
 	sample1a,
@@ -186,22 +186,23 @@ harness.push({callback: mapTests, label: "Map tests"});
 
 harness.push({callback: function (test_label) {
 	var STN = new stn.Stn(),
+		val = {},
 		line;
 	
 	assert.equal(STN.defaults.save_parse, false, "Should NOT have save_parse.");
 	STN.reset();
 	assert.equal(STN.defaults.save_parse, true, "Should have save_parse.");
 	val = STN.valueOf();
-	assert.equal(Object.keys(val).length, 0,"Should have nothing in the parse tree");
+	assert.equal(Object.keys(val).length, 0, "Should have nothing in the parse tree");
 	line = "2012-11-06";
 	STN.addEntry(line);
 	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
-	assert.equal(Object.keys(val).length, 0,"Should have nothing in the parse tree");
+	assert.equal(Object.keys(val).length, 0, "Should have nothing in the parse tree");
 	line = "8:00 - 10:00; staff meeting";
 	STN.addEntry(line);
 	val = STN.valueOf();
 	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
-	assert.equal(Object.keys(val).length, 1,"Should have nothing in the parse tree");
+	assert.equal(Object.keys(val).length, 1, "Should have nothing in the parse tree");
 	assert.notEqual(typeof val["2012-11-06"], "undefined", "Should have a date record now");
 	assert.notEqual(typeof val["2012-11-06"]["8:00 - 10:00"], "undefined", "Should have a time part of the record: " + util.inspect(val));
 
@@ -232,6 +233,8 @@ harness.push({callback: function (test_label) {
 			normalize_date: true,
 			save_parse: true
 		},
+		s,
+		expected_s,
 		timesheet = new stn.Stn({}, config);
 	
 	text = fs.readFileSync("test-samples/timesheet-3.txt");
