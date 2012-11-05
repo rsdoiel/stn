@@ -21,11 +21,11 @@
 		"npm" : ">= 1.1.30"
 	},
 	"dependencies": {
-			"harness": ">= 0.0.3",
+			"harness": ">= 0.0.5",
 			"opt": ">= 0.1.1"
 	},
 	"scripts" : {
-		"test" : "node stn_test.js"
+		"test" : "node tests/stn_test.js"
 	},
 	"bugs": {
 		"url": "http://github.com/rsdoiel/stn/issues"
