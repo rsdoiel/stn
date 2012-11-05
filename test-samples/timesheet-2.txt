@@ -1,0 +1,40 @@
+Test Sample 2
+
+10/18/2012
+
+8:36 - 11:23 misc; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+11:01 - 12:00 stn library; Sed ornare mi non nulla convallis at placerat arcu dapibus.
+
+Nunc a nisl purus. Fusce enim magna, pretium vitae dictum et, imperdiet non est. Aliquam id odio ligula, id consequat tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur luctus, leo ultrices pulvinar facilisis, elit lorem blandit leo, tempor tempus mauris lectus vitae arcu. Nulla consectetur dolor at sem porta ultricies. Vivamus tortor metus, tincidunt vitae fermentum at, volutpat in tortor. Nullam interdum, purus at blandit sodales, dolor lectus ultricies ligula, vel tristique ligula urna eu nibh. Curabitur tristique velit lorem, id bibendum felis.
+
+13:30 - 15:30 stn library; In eu ante sit amet ligula pretium tempor quis nec nulla.
+
+
+10/17/2012
+
+17:50 - 18:50;  misc; Aliquam molestie nulla vitae enim sollicitudin sodales.
+
+9:35 - 10:05; documentation; Ut pretium dui ut neque gravida congue.
+
+10:05 - 11:00; misc; Vestibulum vitae tortor eget leo mollis consectetur.
+
+11:06 - 12:36; stn library; Duis elementum ligula et erat tristique non mollis neque consectetur.
+
+1:38 - 2:38; documentation; Suspendisse semper mauris at ipsum rutrum commodo.
+
+2:31 - 4:31; testing; Nam egestas est eget est tempus sed dignissim nibh sollicitudin.
+
+4:45 - 5:00; testing; Vestibulum mattis erat ut sapien scelerisque non ultrices elit euismod.
+5:30 - 6:32; analysis stn; Fusce et orci enim, sed interdum libero.
+
+2012-10-16
+
+9:23 - 2:00; stn library; brain storming
+
+2:03 - 4:03; stn library; coming up with test cases
+
+8:00 - 11:00; stn libray; prototyping
+
+
+

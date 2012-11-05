@@ -15,7 +15,7 @@ var	util = require('util'),
 	path = require("path"),
 	assert = require('assert'),
 	harness = require("harness"),
-	stn = require('../stn'),
+	stn = new require('../stn').Stn(),
 	test_name = "tests/stn_test.js",
 	sample1_text,
 	sample1a,
@@ -185,5 +185,15 @@ harness.push({callback: function (test_label) {
 
 harness.push({callback: basicTests, label: "Basic tests"});
 harness.push({callback: mapTests, label: "Map tests"});
+
+harness.push({callback: function (test_label) {
+	var STN = new stn.Stn();
+	
+	assert.equal(STN.save_parse, false, "Should NOT have save_parse.");
+	STN.reset();
+	assert.equal(STN.save_parse, true, "Should have save_parse.");
+	
+	harness.completed(test_label);
+}, label: "Tests incremental parsing"});
 
 harness.RunIt(path.basename(test_name), 10);
