@@ -15,7 +15,7 @@ var	util = require('util'),
 	path = require("path"),
 	assert = require('assert'),
 	harness = require("harness"),
-	stn = new require('../stn').Stn(),
+	stn = new require('../stn'),
 	test_name = "tests/stn_test.js",
 	sample1_text,
 	sample1a,
@@ -80,8 +80,6 @@ var basicTests = function (test_label) {
 	Object.keys(sample1b).forEach(function (dy) {
 		assert.ok(result[dy] !== undefined,
 				  "missing from sample1b [" + dy + "] <-- [" + util.inspect(sample1b[dy]) + "]");
-		//console.error("DEBUG result[" + dy + "]: " + util.inspect(result[dy]));// DEBUG
-		//console.error("DEBUG sample1b[" + dy + "]: " + util.inspect(sample1b[dy]));// DEBUG
 		Object.keys(sample1b[dy]).forEach(function (tm) {
 			assert.ok(result[dy][tm] !== undefined,
 					  'sample1b ' + dy + ' -> [' + tm + '] missing in result ' +
@@ -224,4 +222,60 @@ harness.push({callback: function (test_label) {
 	harness.completed(test_label);
 }, label: "Tests incremental parsing"});
 
+
+harness.push({callback: function (test_label) {
+	var text,
+		val = {},
+		config = {
+			tags: false,
+			map: false,
+			normalize_date: true,
+			save_parse: true
+		},
+		timesheet = new stn.Stn({}, config);
+	
+	text = fs.readFileSync("test-samples/timesheet-3.txt");
+	timesheet.parse(text);
+	assert.equal(timesheet.errorCount(), 0, "Should have no errors");
+	val = timesheet.valueOf();
+	assert.ok(val["2012-11-02"], "Should have an entry for 2012-11-02");
+	assert.ok(val["2012-11-02"]["8:00 - 12:15"], "Should have an entry for 2012-11-02, 8:00 - 12:15");
+	expected_s = "M101 MongoDB for Developers class";
+	s = val["2012-11-02"]["8:00 - 12:15"];
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-11-02"]["12:15 - 3:45"];
+	expected_s = "M102 MongoDB for Admins";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-11-01"]["6:30 - 8:30"];
+	expected_s = "professional development; M101 MongoDB Developer course";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-11-01"]["8:50 - 9:50"];
+	expected_s = "news search; implement higher performance JSON API with MongoDB";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+		
+	s = val["2012-11-01"]["11:00 - 2:00"];
+	expected_s = "event calendar; Setup for relink test";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+				
+	s = val["2012-11-01"]["2:30 - 4:30"];
+	expected_s = "news search; implementing a higher performance JSON API with MongoDB";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-10-31"]["6:30 - 7:30"];
+	expected_s = "professional development; M101 MongoDB for developers";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-10-31"]["9:30 - 12:00"];
+	expected_s = "Setup ecal in my sandbox, run relink-event-images.js. Write SPA so Ian, Candy and Sam can review the results. Improve USC object's support for calendar rendering.";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	s = val["2012-10-31"]["1:00 - 4:45"];
+	expected_s = "Write SPA so calendar content can be debugged against eo3 API. Got debug page working.";
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+
+	harness.completed(test_label);
+}, label: "0.0.7 bugs"});
 harness.RunIt(path.basename(test_name), 10);

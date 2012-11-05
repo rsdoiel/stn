@@ -11,6 +11,29 @@
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 var util = require("util");
 
+// reset - clear the parse tree
+// sets save_parse to true,
+// sets normalize_date to true
+// sets tags to true
+// sets map ot false
+// @param options - a set of options to override the defaults with
+// on reset.
+var reset = function (options) {
+	this.defaults = {};
+	this.defaults.normalize_date = true;
+	this.defaults.save_parse = true;
+	this.defaults.tags = true;
+	this.map = false;
+	this.parse_tree = {};
+	this.msgs = [];
+	for (ky in options) {
+		if (options.hasOwnProperty(ky)) {
+			this.defaults[ky] = options[ky];
+		}
+	}
+};
+
+
 var Stn = function (parse_tree, options) {
 	var ky, day, dy;
 
@@ -117,12 +140,24 @@ var parse = function (text, callback, options) {
 		reTime,
 		reDateNormalized;
 
-	if (options === undefined) {
+	if (typeof this.defaults === "undefined" ||
+			typeof this.msgs === "undefined" ||
+			typeof this.parse_tree === "undefined") {
+		this.reset({
+			normalize_date: false,
+			hours: false,
+			tags: false,
+			map: false,
+			save_parse: false
+		});
+	}
+	
+	if (typeof options === "undefined") {
 		options = this.defaults;
 	} else {
 		for (ky in this.defaults) {
 			if (this.defaults.hasOwnProperty(ky)) {
-				if (options[ky] === undefined) {
+				if (typeof options[ky] === "undefined") {
 					options[ky] = this.defaults[ky];
 				}
 			}
@@ -185,7 +220,7 @@ var parse = function (text, callback, options) {
 				if (options.tags) {
 					data[dy][tm].tags = (tmp[0]).split(',');
 				}
-				if (options.map !== false &&
+				if (options.map !== undefined && options.map !== false &&
 						tmp[0] !== undefined &&
 						options.map[tmp[0]] !== undefined) {
 					data[dy][tm].map = options.map[tmp[0]];
@@ -223,21 +258,6 @@ var parse = function (text, callback, options) {
 	}
 	this.working_date = dy;
 	return data;
-};
-
-// reset - clear the parse tree
-// sets save_parse to true,
-// sets normalize_date to true
-var reset = function (options) {
-	this.defaults.normalize_date = true;
-	this.defaults.save_parse = true;
-	this.defaults.tags = true;
-	this.parse_tree = {};
-	for (ky in options) {
-		if (options.hasOwnProperty(ky)) {
-			this.defaults[ky] = options[ky];
-		}
-	}
 };
 
 // Return the current parse tree state.
@@ -462,6 +482,7 @@ Stn.prototype.HHMM = HHMM;
 Stn.prototype.reset = reset;
 Stn.prototype.parse = parse;
 Stn.prototype.error = error;
+Stn.prototype.errorCount = errorCount;
 Stn.prototype.messages = messages;
 Stn.prototype.addEntry = addEntry;
 
