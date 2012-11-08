@@ -9,7 +9,7 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-var util = require("util");
+//var util = require("util"); // DEBUG
 
 
 // Format a date as YYYY-MM-DD
