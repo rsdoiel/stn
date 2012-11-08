@@ -138,4 +138,4 @@ harness.push({callback: function (test_label) {
 	});
 }, label: "Test synchronous read/write"});
 
-harness.RunIt(path.basename(process.argv[1]), 3000);
+harness.RunIt(path.basename(process.argv[1]), 1000);
