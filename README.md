@@ -235,7 +235,7 @@ do that with stn?
 	}).listen(9000);	
 ```
 
-# But what about persistance?
+# But what about persistence?
 
 If you're in a NodeJS environment you can use stnfs.js in the extra's folder. This extends
 the basic stn.js adding readFile(), readFileSync(), writeFile(), and writeFileSync() based
