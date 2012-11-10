@@ -1,5 +1,5 @@
 [![build status](https://secure.travis-ci.org/rsdoiel/stn.png)](http://travis-ci.org/rsdoiel/stn)
-stn - Simple Timesheet Notation
+stn - Simple Time Notation
 ===============================
 
 
@@ -7,20 +7,32 @@ stn - Simple Timesheet Notation
 
 I've often found it necessary to keep track of time spent on projects or 
 activities.  Every "tracking system" I've used has worked for me at some level
-accept one. I always forget to use them. I forget because they break the 
+accept one. I always forget to use them. I forget because they break my 
 workflow. I work with allot of text files so the system that works for me
 is a text file log. Over time I have simplified that format which has made it 
 easy to enter, read or parsing in a program. This module is an implementation 
-of my current practice of writing a simple timesheet notation.
+of my current practice of writing a simple time notation. It was inspired
+by other simple formats like Textile and markdown but rather than focus
+on rendering to HTML this library's focus is to render to a JSON structure.
 
 Here's the summary view of the notation. Dates go in a single line by 
-themselves and are applied to all following time entries; time entries take up 
-a single line and start with a time range; Time ranges can be followed by 
-"tags" which are terminated by a semi-colon if present;  the end
-of line terminates the entry description that will be submitted to the time 
-system.  Text which is not part of a date or time entry is ignored by the 
-parser and assumed to be extraneous notes. This allows me to have working notes 
-as well as time information in the same file.
+themselves. Dates are in the YYYY-MM-DD format (e.g. November 10, 2012 would be
+typed 2012-11-10) and are applied to all following time entries until another
+date is encountered.  The assumed date is always today. Time entries take up 
+a single line and start with a time range. Time ranges are in the form of 
+HH:MM and do not assume 24hr or 12hr representation.  The start time and end
+time are separated by a hyphen. The range itself is terminated by a semi-colon.
+The time range can be followed by "tags". Tags are a comma separated list of words. The tag list is terminated by a semi-colon.  A tag list is optional. 
+The the last semi-colon to the end of the line is the time entry.  Here's
+and example of a recording of travel and a meeting on November 6, 2012 -
+
+```shell
+	2012-11-06
+	
+	7:45 - 8:30; travel; train to meeting
+	
+	8:30 - 12:00; meeting; Met with standing committee for secret project of world domination by miniature sentient petunias.
+```
 
 
 # Notation details
@@ -66,11 +78,22 @@ note it as
 If could also look like this
 
 ```
-	8:30 - 1:00 timesheet; debugging parsing code.
+	8:30 - 13:00 timesheet; debugging parsing code.
 ```
+
+The second nation is better. With the first notation the parser will see that
+the hour 8 is greater than the hour 1 and assume you ment to add 12 to the 1. The problem comes when you try to record something like 6:00 - 7:00 where 7:00
+really is 7:00pm. The parser will mistakenly assume you intended one hour duration and not 13.
 
 Any paragraphs of text that appear after the new line will be ignored until 
 another time range or new date is encountered.
+
+# Embedding JSON
+
+Sometimes you need to track extra things (e.g. weight, height, sleep). You can
+add extra data by typing in JSON blobs. These blobs need to be on a single line and must start and end with a curly bracket (e.g. {lbs: 100, meters: 3.1}).  The parse tree will not include a entry for that preceding date
+or time called meta. In this way you can quickly note simple things without
+having to extend the parser.
 
 # Example timesheet notation
 
@@ -79,7 +102,11 @@ simple timesheet parsing project.
 
 
 ```text
-	11/19/2011
+	2012-11-19
+
+	// A meta entry which records pounds and meters associated with date
+	// Nov. 19, 2011
+	{lbs: 175.0, meters: 2.9}
 	
 	8:30 - 11:00; timesheet notation; Writing a README.md describing my simple timesheet notation.
 	
@@ -90,8 +117,8 @@ simple timesheet parsing project.
 	Realized I need to keep some backward compatibility for my parse so I don't have to rewrite/edit my ascii timesheet file.
 ```
 
-In the last entry starting with "Realized" is skipped in parsing because it is neither a date or time
-entry.
+In the last entry starting with "Realized" is skipped in parsing because it is neither a date, time range or JSON blob
+
 
 ## Rational
 
@@ -113,7 +140,8 @@ JSON object generated from the previous example could look like
 
 ```JavaScript
 	{
-		"11/19/2011": {		
+		"2011-11-19": {
+			"meta": {lbs: 175.0, meters: 2.9},
 			"8:30 - 11:00": "timesheet notation; Writing a README.md describing my simple timesheet notation.",
 			"11:00 - 12:00": "timesheet notation; Drafting a NodeJS example parser for the notation.",
 			"1:00 - 3:00": [
@@ -124,13 +152,14 @@ JSON object generated from the previous example could look like
 	}
 ```
 
-This is find if I want to generate a summary for my own reading.  To be useful 
+This is fine if I want to generate a summary for my own reading.  To be useful 
 to a time tracking system I often need more. An alternative representation 
 might look like
 
 ```JavaScript
 	{
-		"11/19/2011": {		
+		"2011-11-19": {
+				"meta": {lbs: 175.0, meters: 2.9},
 				"8:30 - 11:00": {
 					"project":"timesheet notation",
 					"notes": "Writing a README.md describing my simple timesheet notation.", "hours":"2.5","tags":["stn project"] },
@@ -235,7 +264,7 @@ do that with stn?
 	}).listen(9000);	
 ```
 
-# But what about persistance?
+# But what about persistence?
 
 If you're in a NodeJS environment you can use stnfs.js in the extra's folder. This extends
 the basic stn.js adding readFile(), readFileSync(), writeFile(), and writeFileSync() based
