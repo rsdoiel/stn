@@ -274,5 +274,35 @@ on the NodeJS fs module. See tests/stnfs_test.js for examples of this in action.
 	node tests/stnfs_test.js
 ```
 
+# tag and project relationship
+
+Tag and project relationships can be passed in at the time a the parser
+is initialized (e.g. see extras/harvest-csv.js).  Sometimes you don't know
+what that relationship is ahead of time or want to change that relationship
+mid parse stream.  To allow for that stn.parse() will recognize some
+simple directives. Directives begin with an at sign (i.e. "@").  Two 
+directives will be supported as of version 0.0.9.
+
+* @tag-default TAG
+* @tag TAG; PROJECT_NAME; CLIENT_NAME;
+
+Where @tag-default designates a default tag to apply when processing entries
+containing only a time range and description and @tag is a semi-column separated list consisting of a tag, a project name and client name. 
+
+Here's an example setting up these tag relationships -
+
+```shell
+	@tag travel; World Domination; Dr. Evil
+	@tag meeting; World Domination; Dr. Evil
+	@tag-default meeting
+	
+	2012-11-06
+	
+	7:45 - 8:30; travel; train to meeting
+	
+	8:30 - 12:00; meeting; Met with standing committee for secret project of world domination by miniature sentient petunias.
+```
+
+
 
 
