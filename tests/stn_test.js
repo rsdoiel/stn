@@ -17,10 +17,10 @@ var	util = require('util'),
 	harness = require("harness"),
 	stn = require('../stn'),
 	test_name = "tests/stn_test.js",
-	sample1_text,
-	sample1a,
-	sample1b,
-	sample_map,
+	sample1_text  = fs.readFileSync("test-samples/timesheet-1.txt").toString(),
+	sample1a = JSON.parse(fs.readFileSync("test-samples/timesheet-1a.json").toString()),
+	sample1b = JSON.parse(fs.readFileSync("test-samples/timesheet-1b.json").toString()),
+	sample_map = JSON.parse(fs.readFileSync("test-samples/testmap.json").toString()),
 	result;
 
 try {
@@ -29,49 +29,85 @@ try {
 }
 
 var basicTests = function (test_label) {
-	var i, j;
+	var i,
+		j,
+		timesheet,
+		testmap = sample_map,
+		expected_tm = sample1a,
+		tm,
+		expected_dates,
+		expected_ranges,
+		dates,
+		ranges,
+		expected_s,
+		s;
 	
 	// Call as simple function without callback or options
-	result = stn.parse(sample1_text);
-	assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
-	
-	// Check for missing results
-	i = sample1a.length;
-	j = result.length;
-	Object.keys(sample1a).forEach(function (dy) {
-		assert.ok(result[dy] !== undefined,
-				  "missing from sample1 " + dy + " <-- " + util.inspect(sample1a[dy]));
-		Object.keys(sample1a[dy]).forEach(function (tm) {
-			assert.ok(result[dy][tm] !== undefined,
-					  'sample1 ' + dy + ' -> ' + tm + ' missing in result ' + util.inspect(result[dy]));
-			assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(),
-					  'mrs ' + dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() +
-					  '] !== [' + result[dy][tm].toString() + ']');
+	timesheet = new stn.Stn({}, {
+			normalize_date: false,
+			hours: false,
+			tags: false,
+			map: false,
+			save_parse: false
 		});
-	});
-	assert.equal(i, j, "Missing results");
+	assert.ok(timesheet.defaults, "Should have defaults in timesheet\n" +
+		util.inspect(timesheet));
+	assert.equal(timesheet.defaults.normalize_date, false, "Should have normalize_date set false" +
+		util.inspect(timesheet));
+	assert.equal(timesheet.defaults.hours, false, "Should have hours set false");
+	assert.equal(timesheet.defaults.tags, false, "Should have tags set false");
+	assert.equal(timesheet.defaults.map, false, "Should have map set false");
+	assert.equal(timesheet.defaults.save_parse, false, "Should have save_parse set false");
+	
+	timesheet.parse(sample1_text);
+	tm = timesheet.valueOf();
+	assert.equal(Object.keys(tm).length, 0,
+		"tm should be empty because valueOf() is empty when save_parse is false\n" +
+		util.inspect(tm));
+	// Now save the parse result since save_parse is false 
+	tm = timesheet.parse(sample1_text);
+	assert.ok(tm, "Should get a non-false tm from parsing sample1_text: " + stn.messages());
 
-	i = sample1a.length;
-	j = result.length;
-	// Check for unexpected results 
-	Object.keys(result).forEach(function (dy) {
-		assert.ok(sample1a[dy] !== undefined,
-				  "unexpected in result " + dy + " <-- " + util.inspect(result[dy]));
-		Object.keys(result[dy]).forEach(function (tm) {
-			assert.ok(result[dy][tm] !== undefined,
-					  "result " + dy + ' -> ' + tm + " missing in simple1a " +
-					  util.inspect(sample1a[dy]));
-			assert.ok(sample1a[dy][tm].toString() === result[dy][tm].toString(),
-					  'urs ' + dy + ' ' + tm + ' -> [' + sample1a[dy][tm].toString() +
-					  '] !== [' + result[dy][tm].toString() + ']');
+	// check for Missing results
+	// now see parse trees match
+	expected_dates = Object.keys(expected_tm);
+	dates = Object.keys(tm.valueOf());
+	assert.equal(dates.length, expected_dates.length, "Should have same number of dates\n" +
+		util.inspect(dates) + "\n" + 
+		util.inspect(expected_dates));
+
+	expected_dates.forEach(function (dt, i) {
+		assert.equal(dates.indexOf(dt), expected_dates.indexOf(dt), "Should have date " + dt +
+			" at " + i + "\n" +
+			util.inspect(dates) + "\n" +
+			util.inspect(expected_dates));
+		expected_ranges = Object.keys(expected_tm[dt]);
+		ranges = Object.keys(tm[dt]);
+		assert.equal(expected_ranges.length, ranges.length, "Should have the same number of ranges (" +
+			dt + ", " + i + ")\n" +
+			util.inspect(ranges) + "\n" + util.inspect(expected_ranges));
+		expected_ranges.forEach(function (rng, j) {
+			assert.equal(ranges.indexOf(rng), expected_ranges.indexOf(rng), "Should have same range " +
+				rng + " at " + i + ", " + j);
+			/*
+			assert.ok(tm[dt][rng].map, "Should have a map at " + dt + ", " + rng +
+				"\n" + util.inspect(tm[dt][rng]));
+			assert.ok(tm[dt][rng].tags, "Should have a tags at " + dt + ", " + rng);
+			*/
+			assert.equal(tm[dt][rng].notes, expected_tm[dt][rng].notes, "Should have matching notes");
+			assert.equal(tm[dt][rng].hours, expected_tm[dt][rng].hours, "Should have matching hours");
+			
 		});
 	});
-	assert.equal(i, j, "Missing results");
-	
+	expected_s = JSON.stringify(expected_tm);
+	s = JSON.stringify(tm);
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+		
 	// Test the alternative JSON representation with normalized date, hours and tag extraction
 
 	// Call as simple function without callback or options
-	result = stn.parse(sample1_text, {normalize_date: true, hours: true, tags: true});
+	stn.defaults = {normalize_date: true, hours: true, tags: true, save_parse: false, map: false};
+	result = stn.parse(sample1_text);
 	assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
 
 	// Check for missing results
@@ -99,8 +135,8 @@ var basicTests = function (test_label) {
 	assert.equal(i, j, "Missing results");
 	
 	// Check for unexpected results 
-	i = sample1b.length;
-	j = result.length;
+	i = Object.keys(sample1b).length;
+	j = Object.keys(result).length;
 	Object.keys(result).forEach(function (dy) {
 		assert.ok(sample1b[dy] !== undefined,
 				  "unexpected in result " + dy + " <-- " + util.inspect(result[dy]));
@@ -185,23 +221,23 @@ harness.push({callback: basicTests, label: "Basic tests"});
 harness.push({callback: mapTests, label: "Map tests"});
 
 harness.push({callback: function (test_label) {
-	var STN = new stn.Stn(),
+	var timesheet = new stn.Stn({}, {save_parse: false}),
 		val = {},
 		line;
 	
-	assert.equal(STN.defaults.save_parse, false, "Should NOT have save_parse.");
-	STN.reset();
-	assert.equal(STN.defaults.save_parse, true, "Should have save_parse.");
-	val = STN.valueOf();
+	assert.equal(timesheet.defaults.save_parse, false, "Should NOT have save_parse.");
+	timesheet.reset();
+	assert.equal(timesheet.defaults.save_parse, true, "Should have save_parse.");
+	val = timesheet.valueOf();
 	assert.equal(Object.keys(val).length, 0, "Should have nothing in the parse tree");
 	line = "2012-11-06";
-	STN.addEntry(line);
-	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
+	timesheet.addEntry(line);
+	assert.equal(timesheet.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + timesheet.working_date);
 	assert.equal(Object.keys(val).length, 0, "Should have nothing in the parse tree");
 	line = "8:00 - 10:00; staff meeting";
-	STN.addEntry(line);
-	val = STN.valueOf();
-	assert.equal(STN.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + STN.working_date);
+	timesheet.addEntry(line);
+	val = timesheet.valueOf();
+	assert.equal(timesheet.working_date, "2012-11-06", "Should have a working date of 2012-11-06: " + timesheet.working_date);
 	assert.equal(Object.keys(val).length, 1, "Should have nothing in the parse tree");
 	assert.notEqual(typeof val["2012-11-06"], "undefined", "Should have a date record now");
 	assert.notEqual(typeof val["2012-11-06"]["8:00 - 10:00"], "undefined", "Should have a time part of the record: " + util.inspect(val));
@@ -213,7 +249,7 @@ harness.push({callback: function (test_label) {
 	assert.equal(val["2012-11-06"]["8:00 - 10:00"].notes, "", "Should *.notes === '': " + util.inspect(val));
 	
 	line = "2:30 - 4:30; weekly; with Boss";
-	STN.addEntry(line);
+	timesheet.addEntry(line);
 	assert.equal(val["2012-11-06"]["2:30 - 4:30"].map, false, "Should *.map === false: " + util.inspect(val));
 
 	assert.equal(val["2012-11-06"]["2:30 - 4:30"].tags[0], "weekly", "Should *.tags[0] === 'staff meeting': " + util.inspect(val));
@@ -231,16 +267,17 @@ harness.push({callback: function (test_label) {
 			tags: false,
 			map: false,
 			normalize_date: true,
-			save_parse: true
+			hours: false,
+			save_parse: false
 		},
 		s,
 		expected_s,
 		timesheet = new stn.Stn({}, config);
 	
 	text = fs.readFileSync("test-samples/timesheet-3.txt");
-	timesheet.parse(text);
+	val = timesheet.parse(text);
 	assert.equal(timesheet.errorCount(), 0, "Should have no errors");
-	val = timesheet.valueOf();
+
 	assert.ok(val["2012-11-02"], "Should have an entry for 2012-11-02");
 	assert.ok(val["2012-11-02"]["8:00 - 12:15"], "Should have an entry for 2012-11-02, 8:00 - 12:15");
 	expected_s = "M101 MongoDB for Developers class";
@@ -278,7 +315,108 @@ harness.push({callback: function (test_label) {
 	s = val["2012-10-31"]["1:00 - 4:45"];
 	expected_s = "Write SPA so calendar content can be debugged against eo3 API. Got debug page working.";
 	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
-
 	harness.completed(test_label);
 }, label: "0.0.7 bugs"});
+
+harness.push({callback: function (test_label) {
+	var timesheet = new stn.Stn({}, {map: false, tags: false, save_parse: false}),
+		timesheet_1_txt = fs.readFileSync("test-samples/timesheet-1.txt").toString(),
+		testmap_json = fs.readFileSync("test-samples/testmap.json").toString(),
+		testmap = JSON.parse(testmap_json),
+		line,
+		expected_tm,
+		tm,
+		expected_pt,
+		pt,
+		expected_dates,
+		dates,
+		expected_ranges,
+		ranges,
+		expected_s,
+		s;
+	
+	assert.equal(timesheet.defaults.map, false, "Should map should not be set yet." + util.inspect(timesheet));
+	assert.equal(timesheet.defaults.tags, false, "Should tags should not be set yet. " + util.inspect(timesheet));
+	assert.equal(timesheet.defaults.save_parse, false, "Should NOT have save_parse. " + util.inspect(timesheet));
+	
+	line = "@tag weekly meeting; ACME General serivces; Planning;ACME CEO William Williams";
+	timesheet.addEntry(line);
+	assert.equal(timesheet.defaults.save_parse, true, "Should have defaults.save_parse.");
+	assert.equal(timesheet.save_parse, true, "Should have save_parse.");
+	assert.equal(timesheet.defaults.tags, true, "Should tags should not be set yet." + util.inspect(timesheet));
+	assert.equal(typeof timesheet.defaults.map, "object", "Map should now be an object. " + util.inspect(timesheet));
+	assert.equal(typeof timesheet.defaults.map["weekly meeting"], "object", "Should have weekly meeting tag. " + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.defaults.map["weekly meeting"].project_name, "ACME General serivces", "Should have weekly meeting project_name 'ACME General serivces' " + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.defaults.map["weekly meeting"].task, "Planning", "Should have weekly meeting task 'Planning'" + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.defaults.map["weekly meeting"].client_name, "ACME CEO William Williams", "Should have weekly meeting client_name 'ACME CEO William Williams' " + util.inspect(timesheet.defaults.map));
+	assert.equal(Object.keys(timesheet.parse_tree).length, 0, "Shouldn't have anything in parse tree yet.");
+	
+	line = "2012-11-11";
+	timesheet.addEntry(line);
+	assert.equal(timesheet.working_date, "2012-11-11", "Should have a working date");
+	assert.equal(Object.keys(timesheet.parse_tree).length, 0, "Shouldn't have anything in parse tree yet.");
+	line = "08:00 - 11:00; weekly meeting";
+	timesheet.addEntry(line);
+	assert.equal(Object.keys(timesheet.parse_tree).length,  1, "Should have something in parse tree." + util.inspect(timesheet));
+
+	// Now run with timesheet-1.txt data, and testmap.json data
+	// and compare two stn objects.
+	testmap.save_parse = true;
+	testmap.tags = true;
+	testmap.map = true;
+	expected_tm = new stn.Stn({}, testmap);
+	tm = new stn.Stn();
+	
+	expected_tm.parse(timesheet_1_txt);
+	// Recreating timesheet_1_txt and testmap incrementally
+	Object.keys(testmap).forEach(function (ky, i) {
+		tm.parse(["@tag " + ky, 
+			testmap[ky].project_name, 
+			testmap[ky].task, 
+			testmap[ky].client_name].join("; "));
+	});
+	tm.parse(timesheet_1_txt);
+
+	// Now save the parse trees for analysis
+	expected_pt = expected_tm.valueOf();
+	pt = tm.valueOf();
+	
+	// now see parse trees match
+	expected_dates = Object.keys(expected_pt);
+	dates = Object.keys(pt);
+	assert.equal(expected_dates.length, dates.length, "Should have same number of dates\n" +
+		util.inspect(dates) + "\n" +
+		util.inspect(expected_dates));
+	expected_dates.forEach(function (dt, i) {
+		assert.equal(dates.indexOf(dt), expected_dates.indexOf(dt), "Should have date " + dt + " at " + i);
+		expected_ranges = Object.keys(expected_pt[dt]);
+		ranges = Object.keys(pt[dt]);
+		assert.equal(expected_ranges.length, ranges.length, "Should have the same number of ranges (" +
+			dt + ", " + i + ")\n" +
+			util.inspect(ranges) + "\n" + util.inspect(expected_ranges));
+		expected_ranges.forEach(function (rng, j) {
+			assert.equal(ranges.indexOf(rng), expected_ranges.indexOf(rng), "Should have same range " +
+				rng + " at " + i + ", " + j);
+			assert.ok(pt[dt][rng].map ||
+				pt[dt][rng].map === false,
+				"Should have a map at " + dt + ", " + rng + "\n" + util.inspect(pt));
+			assert.ok(pt[dt][rng].tags, "Should have a tags at " + dt + ", " + rng);
+			assert.equal(pt[dt][rng].notes, expected_pt[dt][rng].notes, "Should have matching notes");
+			assert.equal(pt[dt][rng].hours, expected_pt[dt][rng].hours, "Should have matching hours");
+		});
+	});
+	expected_s = String(expected_tm.valueOf());
+	s = String(tm.valueOf());
+	assert.equal(s.length, expected_s.length, "s.length: " + s.length +
+		", expected_s.length: " + expected_s.length + "\n" + s);
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+	
+	// Make sure toString() is rendering consistantly.
+	expected_s = expected_tm.toString();
+	s = tm.toString();
+	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+	
+	harness.completed(test_label);
+}, label: "@ directives"});
+
 harness.RunIt(path.basename(test_name), 10);

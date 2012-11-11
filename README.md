@@ -276,25 +276,22 @@ on the NodeJS fs module. See tests/stnfs_test.js for examples of this in action.
 
 # tag and project relationship
 
-Tag and project relationships can be passed in at the time a the parser
-is initialized (e.g. see extras/harvest-csv.js).  Sometimes you don't know
-what that relationship is ahead of time or want to change that relationship
-mid parse stream.  To allow for that stn.parse() will recognize some
-simple directives. Directives begin with an at sign (i.e. "@").  Two 
-directives will be supported as of version 0.0.9.
+Tag, project, client and task relationships can be passed in at the time a 
+the stn parser is initialized (e.g. see extras/harvest-csv.js). It can also
+be discovered by the string of content being parsed using a simple parse
+directive. Parse Directives begin with an at sign (i.e. "@").  One parse
+directive exists as of version 0.0.9.
 
-* @tag-default TAG
-* @tag TAG; PROJECT_NAME; CLIENT_NAME;
+* @tag TAG; PROJECT_NAME; TASK_NAME; CLIENT_NAME;
 
-Where @tag-default designates a default tag to apply when processing entries
-containing only a time range and description and @tag is a semi-column separated list consisting of a tag, a project name and client name. 
+Where TAG is the tag to associate the following three elements with. Just as
+a time entry is an ordered semi-column separated list so is @tag.
 
 Here's an example setting up these tag relationships -
 
 ```shell
-	@tag travel; World Domination; Dr. Evil
-	@tag meeting; World Domination; Dr. Evil
-	@tag-default meeting
+	@tag travel; World Domination; Moving; Dr. Evil
+	@tag meeting; World Domination; Planning; Dr. Evil
 	
 	2012-11-06
 	
@@ -303,6 +300,35 @@ Here's an example setting up these tag relationships -
 	8:30 - 12:00; meeting; Met with standing committee for secret project of world domination by miniature sentient petunias.
 ```
 
+When these are parsed they will render a structure like -
 
+```JavaScript
+	{ 
+		'2012-11-06': {
+			'7:45 - 8:30': {
+				map: {
+					project_name: 'World Domination',
+		  			task: 'Moving',
+					client_name: 'Dr. Evil'
+				},
+				notes: 'train to meeting',
+				tags: [ 'travel' ],
+				hours: '0.75'
+			},
+			'8:30 - 12:00': {
+				map: {
+					project_name: 'World Domination',
+					task: 'Planning',
+					client_name: 'Dr. Evil'
+				},
+				notes: 'Met with standing committee for secret project of world domination by miniature sentient petunias.',
+				tags: ['meeting'],
+				hours: '3.5' 
+			} 
+		} 
+	}
+```
 
+If no tag column is provided than map will be false and a post parse process
+will be responsible for handling that condition.
 

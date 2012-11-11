@@ -64,53 +64,51 @@
 	// @param options - a set of options to override the defaults with
 	// on reset.
 	var reset = function (options) {
-		var ky;
+		var ky, 
+			default_keys = [
+				"normalize_date",
+				"hours",
+				"save_parse",
+				"tags",
+				"map"
+			],
+			defaults = {},
+			map = {};
 
-		this.defaults = {};
-		this.defaults.normalize_date = true;
-		this.defaults.save_parse = true;
-		this.defaults.tags = true;
+		default_keys.forEach(function (ky) {
+			defaults[ky] = true;
+		});
+		this.defaults = defaults;
 		this.map = false;
 		this.parse_tree = {};
 		this.msgs = [];
-		for (ky in options) {
-			if (options.hasOwnProperty(ky)) {
-				this.defaults[ky] = options[ky];
+		if (options !== undefined) {
+			for (ky in options) {
+				if (options.hasOwnProperty(ky)) {
+					if (default_keys.indexOf(ky) >= 0) {
+						this.defaults[ky] = options[ky];
+					} else {
+						map[ky] = options[ky];
+					}
+				}
+			}
+			if (Object.keys(map).length > 0) {
+				this.map = map;
 			}
 		}
 	};
 
 
 	var Stn = function (parse_tree, options) {
-		var ky, day, dy;
-
-		this.msgs = [];
-		this.defaults = {
-	        normalize_date: false,
-			hours: false,
-			tags: false,
-			map: false,
-			save_parse: false
-		};
-
-		if (typeof parse_tree === "undefined") {
-			this.parse_tree = {};
-		} else {
-			this.parse_tree = parse_tree;
-		}
-
-		// Copy in the options overwriting the defaults.
-		for (ky in options) {
-			if (options.hasOwnProperty(ky)) {
-				this.defaults[ky] = options[ky];
-			}
-		}
-
-		this.save_parse = this.defaults.save_parse;
+		var day,
+			dy;
+		
+		// Initialize this with reset().
+		this.reset(options);
 		day = new Date();
 		dy = YYYYMMDD(day);
 		this.working_date = dy;
-
+		this.parse_tree = parse_tree;
 		return this;
 	};
 
@@ -148,7 +146,12 @@
 	 * @return string representing in messages
 	 */
 	var messages = function (no_clear) {
-		var result = this.msgs.join("\n");
+		var result;
+		
+		if (this.msgs === undefined) {
+			this.msgs = [];
+		}
+		result = this.msgs.join("\n");
 
 		// set optional default i needed
 		if (no_clear !== undefined) {
@@ -177,11 +180,12 @@
 	 * errors were found.
 	 */
 	var parse = function (text, callback, options) {
-		var lines,
+		var self = this,
+			lines,
 			ky,
 			data = {},
 			dy = this.working_date,
-			tm,
+			reParseDirective,
 			reDateEntry,
 			reTimeEntry,
 			reTime,
@@ -190,13 +194,7 @@
 		if (typeof this.defaults === "undefined" ||
 				typeof this.msgs === "undefined" ||
 				typeof this.parse_tree === "undefined") {
-			this.reset({
-				normalize_date: false,
-				hours: false,
-				tags: false,
-				map: false,
-				save_parse: false
-			});
+			this.reset();
 		}
 		
 		if (typeof options === "undefined") {
@@ -223,6 +221,7 @@
 		}
 
 		lines = String(text).replace(/\r/g, '').split("\n");
+		reParseDirective = /(|\s+)\@\w+/;
 		reDateEntry = /([0-1][0-9]\/[0-3][0-9]\/[0-9][0-9][0-9][0-9]|[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9])$/;
 		reDateNormalized = /[0-9][0-9][0-9][0-9][\s]*-[0-1][0-9]-[\s]*[0-3][0-9]/;
 		reTimeEntry = /^[0-9]+:[0-5][0-9][\s]*\-([\s]*[0-9]+:[0-5][0-9]|now)[:,;\,\ ]*/;
@@ -231,10 +230,49 @@
 		// Read through the text line, by line and create a new JSON
 		// blob
 		lines.forEach(function (line, i) {
-			var day, hrs, tmp, dt, tm;
+			var day, hrs, tmp, tm, tag, project, task, client, cur, clip;
 
 			line = line.trim();
-			if (reDateEntry.exec(line)) {
+			if (reParseDirective.exec(line)) {
+				options.tags = true;
+				options.save_parse = true;
+				self.save_parse = true;
+				if (typeof options.map !== "object") {
+					options.map = {};
+				}
+				// Setup the tag
+				cur = line.indexOf(" ");
+				clip = line.indexOf(";") - cur;
+		
+				if (cur < clip) {
+					project = "untitled";
+					task = "misc";
+					client = "unknown";
+					tag = line.substr(cur, clip).trim();
+					cur += clip + 1;
+					clip = line.substr(cur).indexOf(";");
+					// Set project name
+					if (cur < clip) {
+						project = line.substr(cur, clip).trim();
+						cur += clip + 1;
+						clip = line.substr(cur).indexOf(";");
+						// Set task
+						if (cur < clip) {
+							task = line.substr(cur, clip).trim();
+							cur += clip + 1;
+						}
+						// If we had an empty task then bump past ; if needed.
+						if (line.substr(cur, 1) === ";") {
+							cur += 1;
+						}
+						// Set client _name
+						if (cur < line.length) {
+							client = line.substr(cur).trim();
+						}
+					}
+					options.map[tag] = {project_name: project, task: task, client_name: client};
+				}
+			} else if (reDateEntry.exec(line)) {
 				if (options.normalize_date === true) {
 					if (reDateNormalized.exec(line.trim())) {
 						dy = line.trim();
