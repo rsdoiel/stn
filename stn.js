@@ -244,7 +244,7 @@
 				cur = line.indexOf(" ");
 				clip = line.indexOf(";") - cur;
 		
-				if (cur < clip) {
+				if (clip > -1) {
 					project = "untitled";
 					task = "misc";
 					client = "unknown";
@@ -252,12 +252,12 @@
 					cur += clip + 1;
 					clip = line.substr(cur).indexOf(";");
 					// Set project name
-					if (cur < clip) {
+					if (clip > -1) {
 						project = line.substr(cur, clip).trim();
 						cur += clip + 1;
 						clip = line.substr(cur).indexOf(";");
 						// Set task
-						if (cur < clip) {
+						if (clip > -1) {
 							task = line.substr(cur, clip).trim();
 							cur += clip + 1;
 						}
