@@ -236,9 +236,10 @@
 			if (reParseDirective.exec(line)) {
 				options.tags = true;
 				options.save_parse = true;
+				options.map = true;
 				self.save_parse = true;
-				if (typeof options.map !== "object") {
-					options.map = {};
+				if (typeof self.map !== "object") {
+					self.map = {};
 				}
 				// Setup the tag
 				cur = line.indexOf(" ");
@@ -270,7 +271,7 @@
 							client = line.substr(cur).trim();
 						}
 					}
-					options.map[tag] = {project_name: project, task: task, client_name: client};
+					self.map[tag] = {project_name: project, task: task, client_name: client};
 				}
 			} else if (reDateEntry.exec(line)) {
 				if (options.normalize_date === true) {
@@ -305,10 +306,15 @@
 					if (options.tags) {
 						data[dy][tm].tags = (tmp[0]).split(',');
 					}
+					// FIXME: I'm only assigning map using all tags as a single key,
+					// Need to loop through keys in that are found in options.tags
 					if (options.map !== undefined && options.map !== false &&
-							tmp[0] !== undefined &&
-							options.map[tmp[0]] !== undefined) {
-						data[dy][tm].map = options.map[tmp[0]];
+						data[dy][tm].tags !== undefined) {
+						data[dy][tm].tags.forEach(function (tag) {
+							if (self.map[tag] !== undefined) {
+								data[dy][tm].map = self.map[tag];
+							}
+						});
 					}
 					hrs = tm.split(' - ');
 					hrs.forEach(function (val, i, times) {

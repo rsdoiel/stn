@@ -344,11 +344,12 @@ harness.push({callback: function (test_label) {
 	assert.equal(timesheet.defaults.save_parse, true, "Should have defaults.save_parse.");
 	assert.equal(timesheet.save_parse, true, "Should have save_parse.");
 	assert.equal(timesheet.defaults.tags, true, "Should tags should not be set yet." + util.inspect(timesheet));
-	assert.equal(typeof timesheet.defaults.map, "object", "Map should now be an object. " + util.inspect(timesheet));
-	assert.equal(typeof timesheet.defaults.map["weekly meeting"], "object", "Should have weekly meeting tag. " + util.inspect(timesheet.defaults.map));
-	assert.equal(timesheet.defaults.map["weekly meeting"].project_name, "ACME General serivces", "Should have weekly meeting project_name 'ACME General serivces' " + util.inspect(timesheet.defaults.map));
-	assert.equal(timesheet.defaults.map["weekly meeting"].task, "Planning", "Should have weekly meeting task 'Planning'" + util.inspect(timesheet.defaults.map));
-	assert.equal(timesheet.defaults.map["weekly meeting"].client_name, "ACME CEO William Williams", "Should have weekly meeting client_name 'ACME CEO William Williams' " + util.inspect(timesheet.defaults.map));
+	assert.strictEqual(timesheet.defaults.map, true, "Map should now be set true. " + util.inspect(timesheet));
+	assert.equal(typeof timesheet.map, "object", "Should have timesheet.map as object " + util.inspect(timesheet.defaults.map));
+	assert.equal(typeof timesheet.map["weekly meeting"], "object", "Should have weekly meeting tag. " + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.map["weekly meeting"].project_name, "ACME General serivces", "Should have weekly meeting project_name 'ACME General serivces' " + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.map["weekly meeting"].task, "Planning", "Should have weekly meeting task 'Planning'" + util.inspect(timesheet.defaults.map));
+	assert.equal(timesheet.map["weekly meeting"].client_name, "ACME CEO William Williams", "Should have weekly meeting client_name 'ACME CEO William Williams' " + util.inspect(timesheet.defaults.map));
 	assert.equal(Object.keys(timesheet.parse_tree).length, 0, "Shouldn't have anything in parse tree yet.");
 	
 	line = "2012-11-11";
@@ -377,6 +378,7 @@ harness.push({callback: function (test_label) {
 	});
 	tm.parse(timesheet_1_txt);
 
+	assert.ok(tm.defaults.map, "We have a map indefaults");
 	// Now save the parse trees for analysis
 	expected_pt = expected_tm.valueOf();
 	pt = tm.valueOf();
@@ -415,7 +417,7 @@ harness.push({callback: function (test_label) {
 	expected_s = expected_tm.toString();
 	s = tm.toString();
 	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
-	
+
 	harness.completed(test_label);
 }, label: "@ directives"});
 
