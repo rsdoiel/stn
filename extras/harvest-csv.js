@@ -74,7 +74,7 @@ opt.on("ready", function (config) {
 		}
 	}, "Set the last date for reporting.  Usually a date in YYYY-MM-DD format or 'now'.");
 	
-	opt.option('--timesheet', function (timesheet) {
+	opt.option(['--timesheet'], function (timesheet) {
 		config.timesheet = timesheet;
 	}, "Set the name/path to the timesheet file to read. Defaults to ./Time_Sheet.txt");
 	
