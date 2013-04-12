@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 //
-// harvest-csv.js - generate a CSV file suitable to import into Harvest.
+// rpt-time.js - generate a markdown friendly time report.
 //
 // author: R. S. Doiel, <rsdoiel@gmail.com>
 //
-// copyright (c) 2011
+// copyright (c) 2013
 //
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
@@ -14,6 +14,7 @@
 var fs = require("fs"),
 	path = require("path"),
 	opt = require("opt").create(),
+    fmt = require("fmttxt"),
 	stn = require('stn');
 
 var today = new Date(),
@@ -122,7 +123,8 @@ opt.on("ready", function (config) {
 		return false;
 	};
 	
-	var run_csv = function (config) {
+	var run_rpt = function (config) {
+        var total_hours = 0.0;
 		if (!config.timesheet) {
 			console.error("\n WARNING: Missing timesheet file." + opt.usage());
 			process.exit(1);
@@ -151,50 +153,94 @@ opt.on("ready", function (config) {
 				Last name
 			*/
 	
-			console.log('"date","client","project","task","note","hours","first name","last name"');
+			
+            console.log('|',
+                [
+                    fmt.center("date", 8),
+                    fmt.center("hours", 8),
+                    fmt.center("client", 10),
+                    fmt.center("project", 10),
+                    fmt.center("task", 10),
+                    fmt.center("note", 24),
+                    fmt.center("first name", 12),
+                    fmt.center("last name", 12) 
+                ].join(" | "),
+                '|');
+    		console.log('+-' +
+                [
+                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 24, "-"),
+                    fmt.center("-", 12, "-"),
+                    fmt.center("-", 12, "-") 
+                ].join("-+-") +
+                "-+");
+
 			Object.keys(results).forEach(function (dy) {
 				Object.keys(results[dy]).forEach(function (hr) {
 					if (in_range(config, dy)) {
+                        // Track the toral hours
+                        if (Number(results[dy][hr].hours)) {
+                            total_hours += Number(results[dy][hr].hours);
+                        }
 						if (results[dy][hr].map !== false) {
-							console.log('"' + [
-								dy, results[dy][hr].map.client_name,
-								results[dy][hr].map.project_name,
-								results[dy][hr].map.task,
-								String([
+							console.log('| ' + [
+								fmt.center(dy, 8),
+								fmt.left(results[dy][hr].hours, 8),
+                                fmt.left(results[dy][hr].map.client_name, 10),
+								fmt.left(results[dy][hr].map.project_name, 10),
+								fmt.left(results[dy][hr].map.task, 10),
+								fmt.left(String([
 									results[dy][hr].tags.join(', '),
 									" ",
 									results[dy][hr].notes
-								].join(' ')).replace(/"/g, '&quot;').trim(),
-								results[dy][hr].hours,
-								config.first_name,
-								config.last_name
-							].join('","') + '"');
+								].join(' ')), 24),
+								fmt.left(config.first_name, 12),
+								fmt.left(config.last_name, 12)
+							].join(' | ') + ' |');
 						} else {
-							console.log('"' + [
-								dy,
-								config.client_name,
-								config.project_name,
-								config.task_name,
-								String([
+							console.log('| ' + [
+								fmt.center(dy, 8),
+								fmt.left(results[dy][hr].hours, 8),
+								fmt.left(config.client_name, 10),
+								fmt.left(config.project_name, 10),
+								fmt.left(config.task_name, 10),
+								fmt.left(String([
 									results[dy][hr].tags.join(', '),
 									" ",
 									results[dy][hr].notes
-								].join(' ')).replace(/"/g, '&quot;').trim(),
-								results[dy][hr].hours,
-								config.first_name,
-								config.last_name
-							].join('","') + '"');
+								].join(' ')), 24),
+								fmt.left(config.first_name, 12),
+								fmt.left(config.last_name, 12)
+							].join(' | ') + ' |');
 						}
 					}
 				});
 			});
+    		console.log('+-' +
+                [
+                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 24, "-"),
+                    fmt.center("-", 12, "-"),
+                    fmt.center("-", 12, "-") 
+                ].join("-+-") +
+                "-+");
+
+            console.log("Total Hours:", total_hours);
 		});
 	};
 	
 	// Main Logic
 	(function (argv, config) {
 		opt.optionWith(argv);
-		run_csv(config);
+		run_rpt(config);
 	}(process.argv, config));
 });
 
