@@ -156,8 +156,8 @@ opt.on("ready", function (config) {
 			
             console.log('|',
                 [
-                    fmt.center("date", 8),
-                    fmt.center("hours", 8),
+                    fmt.center("date", 10),
+                    fmt.center("hours", 6),
                     fmt.center("client", 10),
                     fmt.center("project", 10),
                     fmt.center("task", 10),
@@ -168,8 +168,8 @@ opt.on("ready", function (config) {
                 '|');
     		console.log('+-' +
                 [
-                    fmt.center("-", 8, "-"),
-                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 6, "-"),
                     fmt.center("-", 10, "-"),
                     fmt.center("-", 10, "-"),
                     fmt.center("-", 10, "-"),
@@ -188,8 +188,8 @@ opt.on("ready", function (config) {
                         }
 						if (results[dy][hr].map !== false) {
 							console.log('| ' + [
-								fmt.center(dy, 8),
-								fmt.left(results[dy][hr].hours, 8),
+								fmt.center(dy, 10),
+								fmt.left(results[dy][hr].hours, 6),
                                 fmt.left(results[dy][hr].map.client_name, 10),
 								fmt.left(results[dy][hr].map.project_name, 10),
 								fmt.left(results[dy][hr].map.task, 10),
@@ -203,8 +203,8 @@ opt.on("ready", function (config) {
 							].join(' | ') + ' |');
 						} else {
 							console.log('| ' + [
-								fmt.center(dy, 8),
-								fmt.left(results[dy][hr].hours, 8),
+								fmt.center(dy, 10),
+								fmt.left(results[dy][hr].hours, 6),
 								fmt.left(config.client_name, 10),
 								fmt.left(config.project_name, 10),
 								fmt.left(config.task_name, 10),
@@ -222,8 +222,8 @@ opt.on("ready", function (config) {
 			});
     		console.log('+-' +
                 [
-                    fmt.center("-", 8, "-"),
-                    fmt.center("-", 8, "-"),
+                    fmt.center("-", 10, "-"),
+                    fmt.center("-", 6, "-"),
                     fmt.center("-", 10, "-"),
                     fmt.center("-", 10, "-"),
                     fmt.center("-", 10, "-"),
