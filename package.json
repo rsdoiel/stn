@@ -1,34 +1,34 @@
 {
-	"name" : "stn",
-	"version" : "0.0.9",
-	"description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
-	"main" : "./stn.js",
-	"repository" : {
-		"type" : "git", 
-		"url" : "https://github.com/rsdoiel/stn.git"
-	},
-	"author" : {
-		"name" : "R. S. Doiel", 
-		"email" : "rsdoiel@gmail.com", 
-		"url" : "https://github.com/rsdoiel"
-	},
-	"maintainers" : [{
-		"name" : "R. S. Doiel", 
-		"url" : "https://github.com/rsdoiel"
-	}],
-	"engines" : {
-		"node" : "0.10.x",
-		"npm" : "1.2.x"
-	},
-	"dependencies": {
-			"harness": ">= 0.0.5",
-			"opt": ">= 0.1.11",
-            "fmttxt": "0.0.x"
-	},
-	"scripts" : {
-		"test" : "node tests/stn_test.js"
-	},
-	"bugs": {
-		"url": "http://github.com/rsdoiel/stn/issues"
-   	}
+    "name" : "stn",
+    "version" : "0.0.9",
+    "description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
+    "main" : "./stn.js",
+    "repository" : {
+        "type" : "git", 
+        "url" : "https://github.com/rsdoiel/stn.git"
+    },
+    "author" : {
+        "name" : "R. S. Doiel", 
+        "email" : "rsdoiel@gmail.com", 
+        "url" : "https://github.com/rsdoiel"
+    },
+    "maintainers" : [{
+        "name" : "R. S. Doiel", 
+        "url" : "https://github.com/rsdoiel"
+    }],
+    "engines" : {
+        "node" : "0.10.x",
+        "npm" : "1.2.x"
+    },
+    "dependencies": {
+        "harness": ">= 0.0.5",
+        "opt": ">= 0.1.11",
+        "fmttxt": "0.0.x"
+    },
+    "scripts" : {
+        "test" : "node tests/stn_test.js"
+    },
+    "bugs": {
+        "url": "http://github.com/rsdoiel/stn/issues"
+    }
 }
