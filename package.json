@@ -3,6 +3,10 @@
     "version" : "0.0.9",
     "description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
     "main" : "./stn.js",
+    "bin": {
+        "stn-rpt": "./extras/stn-rpt.js",
+        "stn-harvestcsv": "./extras/stn-harvestcsv.js"
+    },
     "repository" : {
         "type" : "git", 
         "url" : "https://github.com/rsdoiel/stn.git"

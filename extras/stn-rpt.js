@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //
-// rpt-time.js - generate a markdown friendly time report.
+// stn-rpt.js - generate a markdown friendly time report.
 //
 // author: R. S. Doiel, <rsdoiel@gmail.com>
 //

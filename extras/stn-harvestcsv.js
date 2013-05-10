@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 //
-// harvest-csv.js - generate a CSV file suitable to import into Harvest.
+// stn-harvestcsv.js - generate a CSV file suitable to import into Harvest.
 //
 // author: R. S. Doiel, <rsdoiel@gmail.com>
 //
-// copyright (c) 2011
+// copyright (c) 2011, 2013
 //
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
