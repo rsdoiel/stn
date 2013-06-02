@@ -14,7 +14,7 @@ var	util = require('util'),
 	fs = require('fs'),
 	path = require("path"),
 	assert = require('assert'),
-	harness = require("harness"),
+    Y = require("yui").use("test"),
 	stn = require('../stn'),
 	test_name = "tests/stn_test.js",
 	sample1_text  = fs.readFileSync("test-samples/timesheet-1.txt").toString(),
@@ -23,12 +23,15 @@ var	util = require('util'),
 	sample_map = JSON.parse(fs.readFileSync("test-samples/testmap.json").toString()),
 	result;
 
+
 try {
 	test_name = module.filename;
 } catch (err0) {
 }
 
-var basicTests = function (test_label) {
+var basicTests = new Y.Test.Case({
+    name: "Basic Tests",
+    "Should pass basic setup": function () {
 	var i,
 		j,
 		timesheet,
@@ -158,10 +161,12 @@ var basicTests = function (test_label) {
 		});
 	});
 	assert.equal(i, j, "Missing or unexpected results");
-	harness.completed(test_label);
-};
+}
+});
 
-var mapTests = function (test_label) {
+var mapTests = new Y.Test.Case({
+    name: "mapTests",
+    "Should pass mapTests": function () {
 	// Call as simple function without callback or options
 	result = stn.parse(sample1_text, {map: sample_map});
 	assert.ok(result, "Should get a non-false results from parsing sample1_text: " + stn.messages());
@@ -182,13 +187,14 @@ var mapTests = function (test_label) {
 			}
 		});
 	});
-	harness.completed(test_label);
-};
-
+}
+});
 
 
 // Testing
-harness.push({callback: function (test_label) {
+var initTests = new Y.Test.Case({
+    name: "Initialization tests.",
+    "Should initialize properly": function() {
 	// Setup and read in samples to run tests on
 	sample1_text = fs.readFileSync("test-samples/timesheet-1.txt").toString();
 	try {
@@ -214,13 +220,16 @@ harness.push({callback: function (test_label) {
 	assert.strictEqual(typeof stn, 'object', "Should have an stn object: " + typeof stn);
 	assert.strictEqual(typeof stn.parse, 'function',
 					   "Should have an stn.parse method on stn object: " + util.inspect(stn));
-	harness.completed(test_label);
-}, label: "Initialization tests."});
+}
+});
 
-harness.push({callback: basicTests, label: "Basic tests"});
-harness.push({callback: mapTests, label: "Map tests"});
+Y.Test.Runner.add(initTests);
+Y.Test.Runner.add(basicTests);
+Y.Test.Runner.add(mapTests);
 
-harness.push({callback: function (test_label) {
+var incrementalParseTests = new Y.Test.Case({
+    name: "Tests incremental parsing",
+    "Should parse incrementally": function () {
 	var timesheet = new stn.Stn({}, {save_parse: false}),
 		val = {},
 		line;
@@ -255,12 +264,14 @@ harness.push({callback: function (test_label) {
 	assert.equal(val["2012-11-06"]["2:30 - 4:30"].tags[0], "weekly", "Should *.tags[0] === 'staff meeting': " + util.inspect(val));
 
 	assert.equal(val["2012-11-06"]["2:30 - 4:30"].notes, "with Boss", "Should *.notes === 'with Boss': " + util.inspect(val));
-	
-	harness.completed(test_label);
-}, label: "Tests incremental parsing"});
+}
+});
+Y.Test.Runner.add(incrementalParseTests);
 
 
-harness.push({callback: function (test_label) {
+var bugTests0_0_7 = new Y.Test.Case({
+    namme: "Bug tests for 0.0.7",
+    "Should show bugs fixed": function () {
 	var text,
 		val = {},
 		config = {
@@ -315,10 +326,12 @@ harness.push({callback: function (test_label) {
 	s = val["2012-10-31"]["1:00 - 4:45"];
 	expected_s = "Write SPA so calendar content can be debugged against eo3 API. Got debug page working.";
 	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
-	harness.completed(test_label);
-}, label: "0.0.7 bugs"});
+}
+});
 
-harness.push({callback: function (test_label) {
+var atDirectiveTests = new Y.Test.Case({
+    name: "@ directives",
+    "Should process @ directives": function () {
 	var timesheet = new stn.Stn({}, {map: false, tags: false, save_parse: false}),
 		timesheet_1_txt = fs.readFileSync("test-samples/timesheet-1.txt").toString(),
 		testmap_json = fs.readFileSync("test-samples/testmap.json").toString(),
@@ -417,8 +430,8 @@ harness.push({callback: function (test_label) {
 	expected_s = expected_tm.toString();
 	s = tm.toString();
 	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+}
+});
 
-	harness.completed(test_label);
-}, label: "@ directives"});
+Y.Test.Runner.run();
 
-harness.RunIt(path.basename(test_name), 10);

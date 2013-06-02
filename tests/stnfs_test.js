@@ -13,9 +13,8 @@ var util = require("util"),
 	fs = require("fs"),
 	path = require("path"),
 	assert = require("assert"),
-	harness = require("harness"),
-	stn = require("../stn"),
-	stnfs = require("../extras/stnfs");
+	Y = require("yui").use("test"),
+	stnfs = require("../stnfs");
 
 // Grab some source files to compare with
 var timesheet_1_txt = fs.readFileSync("test-samples/timesheet-1.txt").toString();
@@ -30,7 +29,9 @@ try {
 	// Ignore the errors since the files may not really be there.
 }
 
-harness.push({callback: function (test_label) {
+Y.Test.Runner.add(new Y.Test.Case({
+    name: "Test constructor",
+    "Should test constructors": function () {
 	var obj = new stnfs.StnFS();
 
 	assert.ok(stnfs.toJSON, "stnfs.toJSON() should exist.");	
@@ -44,10 +45,11 @@ harness.push({callback: function (test_label) {
 	assert.equal(typeof obj.readFileSync, "function", "Should have readFileSync()");
 	assert.equal(typeof obj.writeFile, "function", "Should have writeFile()");
 	assert.equal(typeof obj.writeFileSync, "function", "Should have writeFileSync()");
-	harness.completed(test_label);
-}, label: "Test constructor"});
+}}));
 
-harness.push({callback: function (test_label) {
+Y.Test.Runner.add(new Y.Test.Case({
+    name: "Test async read",
+    "Should do async reads": function () {
 	var expected_tm = new stn.Stn(),
 		tm = new stnfs.StnFS();
 	
@@ -68,13 +70,12 @@ harness.push({callback: function (test_label) {
 		expected_s = expected_tm.toString();
 		s = tm.toString();
 		assert.equal(s, expected_s, "JSON:\n" + s + "\n" + expected_s);
-
-		harness.completed(test_label);
 	});
-	
-}, label: "Test async read"});
+}}));
 
-harness.push({callback: function (test_label) {
+Y.Test.Runner.add(new Y.Test.Case({
+    name: "Test async writes",
+    "Should do async writes": function () {
 	var expected_tm = new stn.Stn(),
 		tm = new stnfs.StnFS();
 	
@@ -99,12 +100,13 @@ harness.push({callback: function (test_label) {
 			expected_s = expected_tm.toString();
 			s = buf.toString();
 			assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
-			harness.completed(test_label);
 		});
 	});
-}, label: "Test async write"});
+}}));
 
-harness.push({callback: function (test_label) {
+Y.Test.Runner.add(new Y.Test.Case({
+    name: "Test synchronous read/write",
+    "Should do synchronous read/write": function () {
 	var expected_tm = new stn.Stn(),
 		tm = new stnfs.StnFS(),
 		expected_s,
@@ -134,8 +136,8 @@ harness.push({callback: function (test_label) {
 		expected_s = expected_tm.toString();
 		s = tm.toString();
 		assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
-		harness.completed(test_label);
 	});
-}, label: "Test synchronous read/write"});
+}}));
 
-harness.RunIt(path.basename(process.argv[1]), 500);
+Y.Test.Runner.run();
+
