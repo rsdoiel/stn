@@ -1,6 +1,6 @@
 {
     "name" : "stn",
-    "version" : "0.0.10",
+    "version" : "0.0.11",
     "description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
     "main" : "./stn.js",
     "bin": {
@@ -29,10 +29,10 @@
         "fmttxt": "0.0.x"
     },
     "devDependencies": {
-        "yuitest": "0.7.x"
+        "yui": "3.10.x"
     },
     "scripts" : {
-        "test" : "yuitest tests/stn_test.js tests/stnfs_test.js"
+        "test" : "node tests/stn_test.js && node tests/stnfs_test.js"
     },
     "bugs": {
         "url": "http://github.com/rsdoiel/stn/issues"

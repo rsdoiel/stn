@@ -12,8 +12,9 @@
 var util = require("util"),
 	fs = require("fs"),
 	path = require("path"),
-	assert = require("assert"),
-	YUITest = require("yuitest"),
+	Y = require("yui/test"),
+	assert = Y.Assert,
+    stn = require("../stn"),
 	stnfs = require("../stnfs");
 
 // Grab some source files to compare with
@@ -34,17 +35,17 @@ YUITest.TestRunner.add(new YUITest.TestCase({
     "Should test constructors": function () {
 	var obj = new stnfs.StnFS();
 
-	assert.ok(stnfs.toJSON, "stnfs.toJSON() should exist.");	
-	assert.ok(stnfs.toString, "stnfs.toString() should exist.");
-	assert.ok(stnfs.readFile, "stnfs.readFile should exist.");
-	assert.ok(stnfs.readFileSync, "stnfs.readFileSync should exist.");
-	assert.ok(stnfs.writeFile, "stnfs.readFile should exist.");
-	assert.ok(stnfs.writeFileSync, "stnfs.readFileSync should exist.");
+	Y.assert(stnfs.toJSON, "stnfs.toJSON() should exist.");	
+	Y.assert(stnfs.toString, "stnfs.toString() should exist.");
+	Y.assert(stnfs.readFile, "stnfs.readFile should exist.");
+	Y.assert(stnfs.readFileSync, "stnfs.readFileSync should exist.");
+	Y.assert(stnfs.writeFile, "stnfs.readFile should exist.");
+	Y.assert(stnfs.writeFileSync, "stnfs.readFileSync should exist.");
 
-	assert.equal(typeof obj.readFile, "function", "Should have readFile()");
-	assert.equal(typeof obj.readFileSync, "function", "Should have readFileSync()");
-	assert.equal(typeof obj.writeFile, "function", "Should have writeFile()");
-	assert.equal(typeof obj.writeFileSync, "function", "Should have writeFileSync()");
+	assert.areEqual(typeof obj.readFile, "function", "Should have readFile()");
+	assert.areEqual(typeof obj.readFileSync, "function", "Should have readFileSync()");
+	assert.areEqual(typeof obj.writeFile, "function", "Should have writeFile()");
+	assert.areEqual(typeof obj.writeFileSync, "function", "Should have writeFileSync()");
 }}));
 
 YUITest.TestRunner.add(new YUITest.TestCase({
@@ -60,16 +61,16 @@ YUITest.TestRunner.add(new YUITest.TestCase({
 	tm.readFile("test-samples/timesheet-1.txt", function (err, parse_tree) {
 		var s, expected_s;
 		
-		assert.ok(!err, "Shouldn't have an error on read: " + err);
-		assert.ok(parse_tree, "Should get back the parse tree.");
+		Y.assert(!err, "Shouldn't have an error on read: " + err);
+		Y.assert(parse_tree, "Should get back the parse tree.");
 		
 		expected_s = expected_tm.toJSON();
 		s = tm.toJSON();
-		assert.equal(s, expected_s, "JSON:\n" + s + "\n" + expected_s);
+		assert.areEqual(s, expected_s, "JSON:\n" + s + "\n" + expected_s);
 		
 		expected_s = expected_tm.toString();
 		s = tm.toString();
-		assert.equal(s, expected_s, "JSON:\n" + s + "\n" + expected_s);
+		assert.areEqual(s, expected_s, "JSON:\n" + s + "\n" + expected_s);
 	});
 }}));
 
@@ -81,25 +82,25 @@ YUITest.TestRunner.add(new YUITest.TestCase({
 	
 	expected_tm.reset();
 	expected_tm.parse(timesheet_1_txt);
-	assert.ok(expected_tm.toString(), "Should get something with toString()");
+	Y.assert(expected_tm.toString(), "Should get something with toString()");
 	
 	tm.reset();
 	tm.parse(timesheet_1_txt);
 	tm.writeFile("test-samples/async-write-testsheet-1.txt", function (err) {
-		assert.ok(!err, err);
+		Y.assert(!err, err);
 		console.log("\t\tReading back data for test-samples/async-testsheet-1.txt");
 		fs.readFile("test-samples/async-write-testsheet-1.txt", function (err2, buf) {
 			var expected_tm = new stn.Stn(),
 				s,
 				expected_s;
-			assert.ok(!err2, "Shouldn't get an error reading the file back in. " + err2);
+			Y.assert(!err2, "Shouldn't get an error reading the file back in. " + err2);
 			
 			expected_tm.reset();
 			expected_tm.parse(timesheet_1_txt);
 			console.log("\t\tIn read callback for test-samples/async-testsheet-1.txt");
 			expected_s = expected_tm.toString();
 			s = buf.toString();
-			assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+			assert.areEqual(s, expected_s, "\n" + s + "\n" + expected_s);
 		});
 	});
 }}));
@@ -114,14 +115,14 @@ YUITest.TestRunner.add(new YUITest.TestCase({
 	
 	expected_tm.reset();
 	expected_tm.parse(timesheet_1_txt);
-	assert.ok(expected_tm.toString(), "Should get something with toString()");
+	Y.assert(expected_tm.toString(), "Should get something with toString()");
 	
 	
 	tm.reset();
 	tm.readFileSync("test-samples/async-write-testsheet-1.txt");
 	expected_s = expected_tm.toString();
 	s = tm.toString();
-	assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+	assert.areEqual(s, expected_s, "\n" + s + "\n" + expected_s);
 	
 	tm.reset();
 	tm.parse(timesheet_1_txt);
@@ -131,11 +132,11 @@ YUITest.TestRunner.add(new YUITest.TestCase({
 	tm.readFile("test-samples/sync-write-testsheet-1.txt", function (err, buf) {
 		var s, expected_s;
 
-		assert.ok(!err, err);
+		Y.assert(!err, err);
 
 		expected_s = expected_tm.toString();
 		s = tm.toString();
-		assert.equal(s, expected_s, "\n" + s + "\n" + expected_s);
+		assert.areEqual(s, expected_s, "\n" + s + "\n" + expected_s);
 	});
 }}));
 
