@@ -32,7 +32,7 @@
         "yuitest": "0.7.x"
     },
     "scripts" : {
-        "test" : "yuitest tests/stn_test.js && yuitest tests/stnfs_test.js"
+        "test" : "yuitest tests/stn_test.js tests/stnfs_test.js"
     },
     "bugs": {
         "url": "http://github.com/rsdoiel/stn/issues"
