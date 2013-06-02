@@ -14,7 +14,7 @@ var	util = require('util'),
 	fs = require('fs'),
 	path = require("path"),
 	assert = require('assert'),
-    Y = require("yui").use("test"),
+    YUITest = require("yuitest"),
 	stn = require('../stn'),
 	test_name = "tests/stn_test.js",
 	sample1_text  = fs.readFileSync("test-samples/timesheet-1.txt").toString(),
@@ -29,7 +29,7 @@ try {
 } catch (err0) {
 }
 
-var basicTests = new Y.Test.Case({
+var basicTests = new YUITest.TestCase({
     name: "Basic Tests",
     "Should pass basic setup": function () {
 	var i,
@@ -164,7 +164,7 @@ var basicTests = new Y.Test.Case({
 }
 });
 
-var mapTests = new Y.Test.Case({
+var mapTests = new YUITest.TestCase({
     name: "mapTests",
     "Should pass mapTests": function () {
 	// Call as simple function without callback or options
@@ -192,7 +192,7 @@ var mapTests = new Y.Test.Case({
 
 
 // Testing
-var initTests = new Y.Test.Case({
+var initTests = new YUITest.TestCase({
     name: "Initialization tests.",
     "Should initialize properly": function() {
 	// Setup and read in samples to run tests on
@@ -223,11 +223,11 @@ var initTests = new Y.Test.Case({
 }
 });
 
-Y.Test.Runner.add(initTests);
-Y.Test.Runner.add(basicTests);
-Y.Test.Runner.add(mapTests);
+YUITest.TestRunner.add(initTests);
+YUITest.TestRunner.add(basicTests);
+YUITest.TestRunner.add(mapTests);
 
-var incrementalParseTests = new Y.Test.Case({
+var incrementalParseTests = new YUITest.TestCase({
     name: "Tests incremental parsing",
     "Should parse incrementally": function () {
 	var timesheet = new stn.Stn({}, {save_parse: false}),
@@ -266,10 +266,10 @@ var incrementalParseTests = new Y.Test.Case({
 	assert.equal(val["2012-11-06"]["2:30 - 4:30"].notes, "with Boss", "Should *.notes === 'with Boss': " + util.inspect(val));
 }
 });
-Y.Test.Runner.add(incrementalParseTests);
+YUITest.TestRunner.add(incrementalParseTests);
 
 
-var bugTests0_0_7 = new Y.Test.Case({
+var bugTests0_0_7 = new YUITest.TestCase({
     namme: "Bug tests for 0.0.7",
     "Should show bugs fixed": function () {
 	var text,
@@ -329,7 +329,7 @@ var bugTests0_0_7 = new Y.Test.Case({
 }
 });
 
-var atDirectiveTests = new Y.Test.Case({
+var atDirectiveTests = new YUITest.TestCase({
     name: "@ directives",
     "Should process @ directives": function () {
 	var timesheet = new stn.Stn({}, {map: false, tags: false, save_parse: false}),
@@ -433,5 +433,5 @@ var atDirectiveTests = new Y.Test.Case({
 }
 });
 
-Y.Test.Runner.run();
+YUITest.TestRunner.run();
 

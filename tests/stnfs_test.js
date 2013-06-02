@@ -13,7 +13,7 @@ var util = require("util"),
 	fs = require("fs"),
 	path = require("path"),
 	assert = require("assert"),
-	Y = require("yui").use("test"),
+	YUITest = require("yuitest"),
 	stnfs = require("../stnfs");
 
 // Grab some source files to compare with
@@ -29,7 +29,7 @@ try {
 	// Ignore the errors since the files may not really be there.
 }
 
-Y.Test.Runner.add(new Y.Test.Case({
+YUITest.TestRunner.add(new YUITest.TestCase({
     name: "Test constructor",
     "Should test constructors": function () {
 	var obj = new stnfs.StnFS();
@@ -47,7 +47,7 @@ Y.Test.Runner.add(new Y.Test.Case({
 	assert.equal(typeof obj.writeFileSync, "function", "Should have writeFileSync()");
 }}));
 
-Y.Test.Runner.add(new Y.Test.Case({
+YUITest.TestRunner.add(new YUITest.TestCase({
     name: "Test async read",
     "Should do async reads": function () {
 	var expected_tm = new stn.Stn(),
@@ -73,7 +73,7 @@ Y.Test.Runner.add(new Y.Test.Case({
 	});
 }}));
 
-Y.Test.Runner.add(new Y.Test.Case({
+YUITest.TestRunner.add(new YUITest.TestCase({
     name: "Test async writes",
     "Should do async writes": function () {
 	var expected_tm = new stn.Stn(),
@@ -104,7 +104,7 @@ Y.Test.Runner.add(new Y.Test.Case({
 	});
 }}));
 
-Y.Test.Runner.add(new Y.Test.Case({
+YUITest.TestRunner.add(new YUITest.TestCase({
     name: "Test synchronous read/write",
     "Should do synchronous read/write": function () {
 	var expected_tm = new stn.Stn(),
@@ -139,5 +139,5 @@ Y.Test.Runner.add(new Y.Test.Case({
 	});
 }}));
 
-Y.Test.Runner.run();
+YUITest.TestRunner.run();
 

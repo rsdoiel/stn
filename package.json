@@ -29,10 +29,10 @@
         "fmttxt": "0.0.x"
     },
     "devDependencies": {
-        "yui": "3.10.x"
+        "yuitest": "0.7.x"
     },
     "scripts" : {
-        "test" : "node tests/stn_test.js"
+        "test" : "yuitest tests/stn_test.js && yuitest tests/stnfs_test.js"
     },
     "bugs": {
         "url": "http://github.com/rsdoiel/stn/issues"
