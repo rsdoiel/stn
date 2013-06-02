@@ -25,9 +25,11 @@
         "npm" : "1.2.x"
     },
     "dependencies": {
-        "harness": ">= 0.0.5",
         "opt": ">= 0.1.11",
         "fmttxt": "0.0.x"
+    },
+    "devDependencies": {
+        "harness": ">= 0.0.5"
     },
     "scripts" : {
         "test" : "node tests/stn_test.js"
