@@ -1,6 +1,6 @@
 {
     "name" : "stn",
-    "version" : "0.0.9",
+    "version" : "0.0.10",
     "description" : "A small utility library for parsing Simple Timesheet notation into a useful JSON object.",
     "main" : "./stn.js",
     "bin": {
@@ -25,9 +25,11 @@
         "npm" : "1.2.x"
     },
     "dependencies": {
-        "harness": ">= 0.0.5",
-        "opt": ">= 0.1.11",
+        "opt": ">= 0.1.x",
         "fmttxt": "0.0.x"
+    },
+    "devDependencies": {
+        "harness": ">= 0.0.5"
     },
     "scripts" : {
         "test" : "node tests/stn_test.js"
