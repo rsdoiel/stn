@@ -11,7 +11,7 @@
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
-	stn = require("stn");
+	stn = require("./stn");
 
 var StnFS = stn.Stn;
 
