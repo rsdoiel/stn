@@ -160,11 +160,14 @@ opt.on("ready", function (config) {
 								dy, results[dy][hr].map.client_name,
 								results[dy][hr].map.project_name,
 								results[dy][hr].map.task,
+                                results[dy][hr].notes.trim(),
+                                /*
 								String([
 									results[dy][hr].tags.join(', '),
 									" ",
 									results[dy][hr].notes
 								].join(' ')).replace(/"/g, '&quot;').trim(),
+                                */
 								results[dy][hr].hours,
 								config.first_name,
 								config.last_name
@@ -175,11 +178,14 @@ opt.on("ready", function (config) {
 								config.client_name,
 								config.project_name,
 								config.task_name,
+                                results[dy][hr].notes.trim(),
+                                /*
 								String([
 									results[dy][hr].tags.join(', '),
 									" ",
 									results[dy][hr].notes
 								].join(' ')).replace(/"/g, '&quot;').trim(),
+                                */
 								results[dy][hr].hours,
 								config.first_name,
 								config.last_name
