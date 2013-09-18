@@ -124,18 +124,18 @@ In the last entry starting with "Realized" is skipped in parsing because it is n
 
 Over the years I've use various ASCII notation systems to produce web pages for 
 projects and the nice thing about Simple Timesheet Notation is that is very 
-limited in it's assumptions. It is limited enough to be quickly to typed while 
+limited in it's assumptions. It is limited enough to be quickly typed while 
 being easy to read.  It doesn't conflict with the ASCII notation system
-de-jour. E.g. This notation can co-exist in a Markdown or Textile format 
+de-jour. E.g. This notation can co-exist inside of a Markdown or Textile format 
 document.
 
 # output of notation
 
 In recent years I've found outputting data structures in JSON convenient 
 regardless of programming language I'm working in. It seems like a good idea 
-then to focus this module on generating JSON structures from the parsing 
-process. Then wiring up the connection between a time tracking system (e.g.
-Basecamp, Harvest) is reasonably easy to do and maintain. The simplest useful 
+then to focus this  module on generating JSON structures from the parsing 
+Simple Timesheet Notation. This makes wiring up the connection between a time tracking system (e.g.
+Basecamp, Harvest) a reasonable task. The simplest useful 
 JSON object generated from the previous example could look like
 
 ```JavaScript
