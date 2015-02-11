@@ -137,6 +137,7 @@ opt.on("ready", function (config) {
     
         fs.readFile(config.timesheet, function (err, timesheet) {
             if (err) {
+                console.error("ERROR:", err);
                 throw err;
             }
             var results = stn.parse(timesheet,
@@ -156,14 +157,14 @@ opt.on("ready", function (config) {
             
             console.log('|',
                 [
-                    fmt.center("date", 10),
-                    fmt.center("hours", 6),
-                    fmt.center("client", 10),
-                    fmt.center("project", 10),
-                    fmt.center("task", 10),
-                    fmt.center("note", 24),
-                    fmt.center("first name", 12),
-                    fmt.center("last name", 12)
+                    fmt.center("date", 10, " "),
+                    fmt.center("hours", 6, " "),
+                    fmt.center("client", 10, " "),
+                    fmt.center("project", 10, " "),
+                    fmt.center("task", 10, " "),
+                    fmt.center("note", 24, " "),
+                    fmt.center("first name", 12, " "),
+                    fmt.center("last name", 12, " ")
                 ].join(" | "),
                 '|');
             console.log('+-' +
@@ -188,39 +189,25 @@ opt.on("ready", function (config) {
                         }
                         if (results[dy][hr].map !== false) {
                             console.log('| ' + [
-                                fmt.center(dy, 10),
-                                fmt.left(results[dy][hr].hours, 6),
-                                fmt.left(results[dy][hr].map.client_name, 10),
-                                fmt.left(results[dy][hr].map.project_name, 10),
-                                fmt.left(results[dy][hr].map.task, 10),
-                                fmt.left(results[dy][hr].notes, 24),
-                                /*
-								fmt.left(String([
-									results[dy][hr].tags.join(', '),
-									" ",
-									results[dy][hr].notes
-								].join(' ')), 24),
-                                */
-								fmt.left(config.first_name, 12),
-								fmt.left(config.last_name, 12)
+                                fmt.center(dy, 10, " "),
+                                fmt.left(results[dy][hr].hours, 6, " "),
+                                fmt.left(results[dy][hr].map.client_name, 10, " "),
+                                fmt.left(results[dy][hr].map.project_name, 10, " "),
+                                fmt.left(results[dy][hr].map.task, 10, " "),
+                                fmt.left(results[dy][hr].notes, 24, " "),
+								fmt.left(config.first_name, 12, " "),
+								fmt.left(config.last_name, 12, " ")
 							].join(' | ') + ' |');
 						} else {
 							console.log('| ' + [
-								fmt.center(dy, 10),
-								fmt.left(results[dy][hr].hours, 6),
-								fmt.left(config.client_name, 10),
-								fmt.left(config.project_name, 10),
-								fmt.left(config.task_name, 10),
-                                fmt.left(results[dy][hr].notes, 24),
-                                /*
-								fmt.left(String([
-									results[dy][hr].tags.join(', '),
-									" ",
-									results[dy][hr].notes
-								].join(' ')), 24),
-                                */
-								fmt.left(config.first_name, 12),
-								fmt.left(config.last_name, 12)
+								fmt.center(dy, 10, " "),
+								fmt.left(results[dy][hr].hours, 6, " "),
+								fmt.left(config.client_name || "", 10, " "),
+								fmt.left(config.project_name || "", 10, " "),
+								fmt.left(config.task_name || "", 10, " "),
+                                fmt.left(results[dy][hr].notes, 24, " "),
+								fmt.left(config.first_name, 12, " "),
+								fmt.left(config.last_name, 12, " ")
 							].join(' | ') + ' |');
 						}
 					}
